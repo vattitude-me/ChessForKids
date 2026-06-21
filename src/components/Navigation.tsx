@@ -14,6 +14,7 @@ const navItems = [
 const mobileNavItems = [
   { href: '/', label: 'Home', icon: '🏰' },
   { href: '/learn', label: 'Lessons', icon: '📚' },
+  { href: '/play', label: 'Battle', icon: '⚔️' },
   { href: '/puzzles', label: 'Puzzles', icon: '🧩' },
   { href: '/progress', label: 'Progress', icon: '📈' },
 ];
