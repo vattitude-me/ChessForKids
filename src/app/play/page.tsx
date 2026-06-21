@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import ChessBoard from '@/components/ChessBoard';
 import { useGameStore } from '@/lib/store';
 import { DifficultyLevel } from '@/lib/chess-ai';
@@ -18,7 +16,6 @@ const boardThemes: Record<BoardTheme, { dark: string; light: string; label: stri
 };
 
 export default function PlayPage() {
-  const pathname = usePathname();
   const {
     currentDifficultyIndex,
     difficultyLevels,
@@ -101,54 +98,14 @@ export default function PlayPage() {
         <div className="play-bg-gradient absolute inset-0" />
       </div>
 
-      {/* Custom play-page nav header with same dark background as home */}
-      <header className="play-nav-header shrink-0 relative z-20">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-10 py-3">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <Image src="/logo.png" alt="Chess for Kids" width={40} height={40} className="object-contain md:w-[60px] md:h-[60px]" />
-              <span className="font-bold text-xl md:text-2xl lg:text-3xl" style={{ color: '#ffffff' }}>
-                <span style={{ color: '#ffd700' }}>Chess</span>
-                <span className="text-xs md:text-sm lg:text-base block" style={{ color: '#c0b0ff' }}>✦ for Kids ✦</span>
-              </span>
-            </Link>
-
-            <div className="hidden md:flex items-center gap-8">
-              {['Home', 'Lessons', 'Puzzles', 'Progress'].map((label) => {
-                const href = label === 'Home' ? '/' : `/${label.toLowerCase()}`;
-                const isActive = pathname === href;
-                return (
-                  <Link key={label} href={href} className="text-lg lg:text-xl font-semibold transition-colors duration-200 hover:text-white" style={{ color: isActive ? '#ffd700' : '#e0e0e0' }}>
-                    {label}{isActive && ' ✦'}
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Mobile menu button */}
-            <button
-              className="lg:hidden flex items-center justify-center w-10 h-10 rounded-xl"
-              style={{ background: '#ffffff15' }}
-              onClick={() => setMobileMenuOpen(true)}
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e0e0e0" strokeWidth="2.5" strokeLinecap="round"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
-            </button>
-
-            <Link
-              href="/play"
-              className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-base lg:text-lg transition-all duration-200 hover:scale-105"
-              style={{
-                background: 'linear-gradient(135deg, #3b2570, #5b3d99)',
-                color: '#e8dcc8',
-                border: '1px solid #6b4daa80',
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-              Let&apos;s Battle
-            </Link>
-          </div>
-        </div>
-      </header>
+      {/* Mobile settings button */}
+      <button
+        className="lg:hidden fixed top-4 right-4 z-40 flex items-center justify-center w-10 h-10 rounded-full shadow-lg"
+        style={{ background: 'rgba(13, 10, 26, 0.8)', border: '1px solid rgba(155, 127, 212, 0.3)' }}
+        onClick={() => setMobileMenuOpen(true)}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e0e0e0" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+      </button>
 
       {/* Mobile drawer overlay */}
       {mobileMenuOpen && (
@@ -163,19 +120,6 @@ export default function PlayPage() {
             </div>
 
             <div className="p-4 space-y-4">
-              {/* Nav links */}
-              <div className="space-y-2 pb-4 border-b border-[#e8dff5]">
-                {['Home', 'Lessons', 'Puzzles', 'Progress'].map((label) => {
-                  const href = label === 'Home' ? '/' : `/${label.toLowerCase()}`;
-                  const isActive = pathname === href;
-                  return (
-                    <Link key={label} href={href} className="block px-3 py-2.5 rounded-xl font-semibold text-base transition-colors" style={{ color: isActive ? '#9b7fd4' : '#4a3b6b', background: isActive ? '#f5f0ff' : 'transparent' }}>
-                      {label}{isActive && ' ✦'}
-                    </Link>
-                  );
-                })}
-              </div>
-
               {/* Settings */}
               <div className="space-y-3 pb-4 border-b border-[#e8dff5]">
                 <h4 className="text-xs font-bold text-[#9b7fd4] tracking-wider">GAME SETTINGS</h4>
@@ -281,7 +225,7 @@ export default function PlayPage() {
       )}
 
       {/* Main 3-column layout */}
-      <div className="relative z-10 flex-1 flex flex-col lg:flex-row gap-3 xl:gap-4 px-3 xl:px-5 pb-3 min-h-0">
+      <div className="relative z-10 flex-1 flex flex-col lg:flex-row gap-3 xl:gap-4 px-3 xl:px-5 pt-16 md:pt-20 pb-3 min-h-0">
 
         {/* Left Sidebar - hidden on mobile */}
         <aside className="hidden lg:flex w-60 xl:w-68 2xl:w-76 shrink-0 lg:overflow-y-auto lg:max-h-full flex-col gap-3">

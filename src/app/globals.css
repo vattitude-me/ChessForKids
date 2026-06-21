@@ -277,6 +277,52 @@ body {
   color: #a0a0b0;
 }
 
+/* Floating pill nav */
+.nav-pill {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(24px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.nav-pill-item {
+  padding: 10px 16px;
+  color: #e0e0e8;
+}
+
+.nav-pill-item:hover:not(.nav-pill-item-active) {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+}
+
+.nav-pill-item-active {
+  background: linear-gradient(135deg, #7c3aed, #9b59e6);
+  color: #ffffff;
+  padding: 10px 22px;
+  box-shadow:
+    0 4px 16px rgba(124, 58, 237, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.nav-pill-item-label {
+  animation: navLabelIn 0.2s ease-out;
+}
+
+@keyframes navLabelIn {
+  from {
+    opacity: 0;
+    max-width: 0;
+  }
+  to {
+    opacity: 1;
+    max-width: 80px;
+  }
+}
+
 /* Play page - Light fantasy theme */
 .play-page-light {
   background: #f8f4ff;
@@ -286,27 +332,6 @@ body {
   background: linear-gradient(180deg, rgba(237, 228, 248, 0.92) 0%, rgba(248, 244, 255, 0.96) 40%, rgba(250, 248, 255, 0.98) 100%);
 }
 
-.play-nav-header {
-  background: linear-gradient(135deg, rgba(30, 20, 55, 0.92) 0%, rgba(45, 28, 80, 0.9) 50%, rgba(30, 20, 55, 0.92) 100%);
-  border-bottom: 1px solid rgba(155, 127, 212, 0.25);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(12px);
-}
-
-.play-nav-cta {
-  background: linear-gradient(135deg, rgba(155, 127, 212, 0.3), rgba(124, 95, 196, 0.4));
-  border: 1px solid rgba(200, 180, 255, 0.4);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 0 16px rgba(155, 127, 212, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  color: white;
-  transition: all 0.2s ease;
-}
-
-.play-nav-cta:hover {
-  background: linear-gradient(135deg, rgba(155, 127, 212, 0.45), rgba(124, 95, 196, 0.55));
-  box-shadow: 0 0 24px rgba(155, 127, 212, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transform: scale(1.05);
-}
 
 .play-card {
   background: rgba(255, 255, 255, 0.85);
@@ -470,11 +495,273 @@ body {
   filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.3));
 }
 
-/* Hide global nav when play page has its own header */
-body:has(.play-page-container) nav.fixed {
-  display: none !important;
-}
-
+/* Play page doesn't need mobile bottom padding since it's full-height */
 body:has(.play-page-container) > main {
   padding-bottom: 0 !important;
+}
+
+/* Large screens (1920px+) — gentle scale up */
+@media (min-width: 1920px) {
+  .nav-pill {
+    padding: 0.625rem 1.25rem;
+  }
+
+  .nav-pill-item {
+    padding: 11px 18px;
+  }
+
+  .nav-pill-item svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .nav-pill-item span {
+    font-size: 1rem;
+  }
+
+  .nav-pill-item-active {
+    padding: 11px 22px;
+  }
+
+  .nav-pill-logo-img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .nav-pill-logo-text {
+    font-size: 1.1rem;
+  }
+
+  .feature-strip .max-w-6xl {
+    max-width: 90rem;
+  }
+}
+
+/* Extra-large screens (2560px+) */
+@media (min-width: 2560px) {
+  .nav-pill {
+    padding: 0.75rem 1.5rem;
+  }
+
+  .nav-pill-item {
+    padding: 12px 20px;
+  }
+
+  .nav-pill-item svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .nav-pill-item span {
+    font-size: 1.1rem;
+  }
+
+  .nav-pill-item-active {
+    padding: 12px 26px;
+  }
+
+  .nav-pill-logo-img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .nav-pill-logo-text {
+    font-size: 1.25rem;
+  }
+
+  .nav-pill-logo-text span:last-child {
+    font-size: 0.75rem;
+  }
+
+  .feature-strip .max-w-6xl {
+    max-width: 100rem;
+  }
+
+  .feature-strip .feature-title {
+    font-size: 1.4rem;
+  }
+
+  .feature-strip .feature-description {
+    font-size: 1.1rem;
+  }
+
+  .feature-strip img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .play-page-container aside {
+    width: 22rem;
+  }
+
+  .play-page-container .play-card {
+    padding: 1.25rem;
+  }
+}
+
+/* Ultra-wide screens (3000px+) — proportional scaling */
+@media (min-width: 3000px) {
+  .nav-pill {
+    padding: 0.4vw 0.8vw;
+  }
+
+  .nav-pill-item {
+    padding: 0.35vw 0.6vw;
+  }
+
+  .nav-pill-item svg {
+    width: 1.4vw;
+    height: 1.4vw;
+  }
+
+  .nav-pill-item span {
+    font-size: 0.7vw;
+  }
+
+  .nav-pill-item-active {
+    padding: 0.35vw 0.8vw;
+  }
+
+  .nav-pill-logo-img {
+    width: 2.2vw;
+    height: 2.2vw;
+  }
+
+  .nav-pill-logo-text {
+    font-size: 0.7vw;
+  }
+
+  .nav-pill-logo-text span:last-child {
+    font-size: 0.4vw;
+  }
+
+  /* Home page hero — use vw-based sizing for smooth scaling */
+  .home-page .hero-section .max-w-lg,
+  .home-page .hero-section .max-w-xl {
+    max-width: 32vw;
+  }
+
+  .home-page .hero-section h1 span {
+    font-size: 3.2vw;
+  }
+
+  .home-page .hero-section .hero-title-magic {
+    font-size: 4.2vw;
+  }
+
+  .home-page .hero-section p {
+    font-size: 1.1vw;
+    max-width: 24vw;
+  }
+
+  .home-page .hero-section .cta-button {
+    font-size: 1.3vw;
+    padding: 0.8vw 2vw;
+  }
+
+  .home-page .hero-section > .relative.z-10 {
+    padding-left: 3vw;
+    padding-right: 3vw;
+  }
+
+  /* Feature strip */
+  .feature-strip .max-w-6xl {
+    max-width: 80vw;
+  }
+
+  .feature-strip .grid {
+    gap: 1.5vw;
+  }
+
+  .feature-strip a {
+    padding: 1.2vw 1.5vw;
+    border-radius: 0.8vw;
+  }
+
+  .feature-strip .feature-title {
+    font-size: 1.1vw;
+  }
+
+  .feature-strip .feature-description {
+    font-size: 0.8vw;
+  }
+
+  .feature-strip img {
+    width: 5vw;
+    height: 5vw;
+  }
+
+  /* Play page */
+  .play-page-container aside {
+    width: 16vw;
+  }
+
+  .play-page-container .play-card {
+    padding: 1vw;
+    border-radius: 0.8vw;
+  }
+
+  .play-page-container .play-card-title {
+    font-size: 0.6vw;
+    margin-bottom: 0.6vw;
+  }
+
+  .play-page-container .play-card .text-base,
+  .play-page-container .play-card .text-lg {
+    font-size: 0.8vw;
+  }
+
+  .play-page-container .play-vs-header {
+    padding: 0.6vw 1.2vw;
+    border-radius: 0.8vw;
+  }
+
+  .play-page-container .play-vs-header .text-lg {
+    font-size: 0.9vw;
+  }
+
+  .play-page-container .play-avatar {
+    width: 2.5vw;
+    height: 2.5vw;
+    font-size: 1.2vw;
+  }
+
+  .play-page-container .play-vs-badge {
+    font-size: 0.7vw;
+    padding: 0.4vw 1vw;
+  }
+
+  .play-page-container .play-start-btn {
+    font-size: 0.8vw;
+    padding: 0.6vw 1.2vw;
+    border-radius: 0.6vw;
+  }
+
+  .play-page-container .play-board-empty h2 {
+    font-size: 2.2vw;
+  }
+
+  .play-page-container .play-board-empty p {
+    font-size: 1vw;
+  }
+
+  .play-page-container .play-board-empty span.text-7xl {
+    font-size: 3.5vw;
+  }
+
+  .play-board-wrapper-light {
+    max-width: min(100%, calc(100vh - 200px));
+    max-height: min(100%, calc(100vh - 200px));
+  }
+
+  .play-page-container > .relative.flex-1 {
+    gap: 1.2vw;
+    padding-left: 1.5vw;
+    padding-right: 1.5vw;
+  }
+
+  .play-page-container .play-action-btn {
+    font-size: 0.75vw;
+    padding: 0.5vw 1vw;
+  }
 }

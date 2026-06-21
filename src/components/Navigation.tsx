@@ -5,10 +5,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const navItems = [
-  { href: '/', label: 'Home' },
-  { href: '/learn', label: 'Lessons' },
-  { href: '/puzzles', label: 'Puzzles' },
-  { href: '/progress', label: 'Progress' },
+  { href: '/', label: 'Home', icon: 'home' },
+  { href: '/learn', label: 'Lessons', icon: 'book' },
+  { href: '/puzzles', label: 'Puzzles', icon: 'puzzle' },
+  { href: '/progress', label: 'Progress', icon: 'chart' },
+  { href: '/play', label: 'Battle', icon: 'battle' },
 ];
 
 const mobileNavItems = [
@@ -19,66 +20,91 @@ const mobileNavItems = [
   { href: '/progress', label: 'Progress', icon: '📈' },
 ];
 
+function NavIcon({ type, active }: { type: string; active: boolean }) {
+  const color = active ? '#ffffff' : '#d0d0dc';
+  const size = 20;
+
+  switch (type) {
+    case 'home':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+          <path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3l9-8z" />
+        </svg>
+      );
+    case 'book':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+        </svg>
+      );
+    case 'puzzle':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+          <path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5a2.5 2.5 0 00-5 0V5H4c-1.1 0-2 .9-2 2v3.8h1.5a2.5 2.5 0 010 5H2V19c0 1.1.9 2 2 2h3.8v-1.5a2.5 2.5 0 015 0V21H17c1.1 0 2-.9 2-2v-4h1.5a2.5 2.5 0 000-5z" />
+        </svg>
+      );
+    case 'chart':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+          <path d="M4 20h4V10H4v10zm6 0h4V4h-4v16zm6 0h4v-8h-4v8z" />
+        </svg>
+      );
+    case 'battle':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+          <path d="M8 5v14l11-7z" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
+
 export default function Navigation() {
   const pathname = usePathname();
 
   return (
     <>
-      {/* Desktop top nav - transparent overlay */}
-      <nav className="fixed top-0 left-0 right-0 z-50 hidden md:block">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 py-3">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
-              <Image
-                src="/logo.png"
-                alt="Chess for Kids"
-                width={60}
-                height={60}
-                className="object-contain"
-              />
-              <span className="font-bold text-2xl lg:text-3xl" style={{ color: '#ffffff' }}>
-                <span style={{ color: '#ffd700' }}>Chess</span>
-                <span className="text-sm lg:text-base block" style={{ color: '#c0b0ff' }}>
-                  ✦ for Kids ✦
-                </span>
-              </span>
-            </Link>
+      {/* Desktop/Tablet floating pill nav */}
+      <nav className="fixed top-5 left-1/2 -translate-x-1/2 z-50 hidden md:block">
+        <div className="nav-pill flex items-center px-3 lg:px-4 py-2 lg:py-2.5 rounded-full">
+          {/* Logo */}
+          <Link href="/" className="nav-pill-logo flex items-center gap-2 shrink-0 mr-3 lg:mr-4 pl-1">
+            <Image
+              src="/logo.png"
+              alt="Chess for Kids"
+              width={40}
+              height={40}
+              className="nav-pill-logo-img object-contain"
+            />
+            <span className="hidden lg:block font-bold text-base leading-tight nav-pill-logo-text">
+              <span style={{ color: '#ffd700' }}>Chess</span>
+              <span className="text-[10px] block" style={{ color: '#c0b0ff' }}>for Kids</span>
+            </span>
+          </Link>
 
-            {/* Nav links */}
-            <div className="flex items-center gap-8">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="text-lg lg:text-xl font-semibold transition-colors duration-200 hover:text-white"
-                    style={{
-                      color: isActive ? '#ffd700' : '#e0e0e0',
-                    }}
-                  >
-                    {item.label}{isActive && ' ✦'}
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Play button */}
-            <Link
-              href="/play"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-base lg:text-lg transition-all duration-200 hover:scale-105"
-              style={{
-                background: 'linear-gradient(135deg, #3b2570, #5b3d99)',
-                color: '#e8dcc8',
-                border: '1px solid #6b4daa80',
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-              Let's Battle
-            </Link>
+          {/* Nav items */}
+          <div className="flex items-center gap-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`nav-pill-item flex items-center gap-2 rounded-full transition-all duration-300 ${
+                    isActive ? 'nav-pill-item-active' : ''
+                  }`}
+                >
+                  <NavIcon type={item.icon} active={isActive} />
+                  <span className={`font-bold text-sm lg:text-base whitespace-nowrap ${
+                    isActive ? 'text-white nav-pill-item-label' : 'text-[#d0d0dc]'
+                  }`}>
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </nav>
