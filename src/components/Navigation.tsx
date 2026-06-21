@@ -57,7 +57,7 @@ export default function Navigation() {
                       color: isActive ? '#ffd700' : '#e0e0e0',
                     }}
                   >
-                    {item.label}{isActive && '✦'}
+                    {item.label}{isActive && ' ✦'}
                   </Link>
                 );
               })}
@@ -76,7 +76,7 @@ export default function Navigation() {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z" />
               </svg>
-              Play
+              Let's Battle
             </Link>
           </div>
         </div>

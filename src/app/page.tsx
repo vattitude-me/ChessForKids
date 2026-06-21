@@ -3,23 +3,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-function FeatureItem({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+function FeatureCTA({ href, icon, title, description }: { href: string; icon: React.ReactNode; title: string; description: string }) {
   return (
-    <div className="flex flex-col items-center gap-2 text-center px-2 py-5">
-      <span className="mb-1">{icon}</span>
-      <h3 className="text-base md:text-lg font-bold feature-title">{title}</h3>
-      <p className="text-sm md:text-base feature-description">{description}</p>
-    </div>
-  );
-}
-
-function SideNavTab({ href, label }: { href: string; label: string }) {
-  return (
-    <Link
-      href={href}
-      className="side-nav-tab flex items-center justify-center px-6 py-3 font-bold text-base md:text-lg transition-all duration-200 hover:-translate-x-1 hover:brightness-125"
-    >
-      {label}
+    <Link href={href} className="flex items-center gap-4 px-4 py-4 rounded-xl transition-all duration-200 hover:scale-[1.02] hover:brightness-110 group" style={{ background: '#1a1530' }}>
+      <span className="shrink-0">{icon}</span>
+      <div className="flex-1">
+        <h3 className="text-base md:text-lg lg:text-xl font-bold feature-title">{title}</h3>
+        <p className="text-sm md:text-base feature-description">{description}</p>
+      </div>
+      <svg className="shrink-0 transition-transform duration-200 group-hover:translate-x-1" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f0e4cc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 18l6-6-6-6" />
+      </svg>
     </Link>
   );
 }
@@ -44,7 +38,7 @@ export default function Home() {
 
         {/* Hero content */}
         <div className="hero-section relative z-10 flex flex-col h-full px-6 md:px-10 lg:px-16 pt-20 md:pt-24">
-          <div className="flex flex-1 items-start justify-between">
+          <div className="flex flex-1 items-start">
             {/* Left - Heading & CTA */}
             <div className="max-w-lg lg:max-w-xl pt-4 md:pt-8">
               <h1 className="font-extrabold leading-[1.05] mb-5">
@@ -73,34 +67,29 @@ export default function Home() {
                 </svg>
               </Link>
             </div>
-
-            {/* Right - Signpost tabs */}
-            <div className="hidden md:flex flex-col gap-2.5 items-end pt-16 lg:pt-24 pr-2">
-              <SideNavTab href="/learn" label="Learn" />
-              <SideNavTab href="/puzzles" label="Practice" />
-              <SideNavTab href="/play" label="Battle" />
-              <SideNavTab href="/learn" label="Become a Legend!" />
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Features Strip */}
+      {/* CTA Strip */}
       <section className="feature-strip">
-        <div className="max-w-5xl mx-auto px-4 py-6">
-          <div className="grid grid-cols-3 gap-4">
-            <FeatureItem
-              icon={<Image src="/assets/learn_icon.png" alt="Learn" width={64} height={64} />}
+        <div className="max-w-6xl mx-auto px-6 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FeatureCTA
+              href="/learn"
+              icon={<Image src="/assets/learn_icon.png" alt="Learn" width={80} height={80} />}
               title="Step-by-Step Lessons"
               description="Learn at your own pace"
             />
-            <FeatureItem
-              icon={<Image src="/assets/puzzles_icon.png" alt="Puzzles" width={64} height={64} />}
+            <FeatureCTA
+              href="/puzzles"
+              icon={<Image src="/assets/puzzles_icon.png" alt="Puzzles" width={80} height={80} />}
               title="Magic Puzzles & Quests"
               description="Solve, learn and earn rewards"
             />
-            <FeatureItem
-              icon={<Image src="/assets/progress_icon.png" alt="Progress" width={64} height={64} />}
+            <FeatureCTA
+              href="/progress"
+              icon={<Image src="/assets/progress_icon.png" alt="Progress" width={80} height={80} />}
               title="Track Progress & Achievements"
               description="See your growth and shine"
             />

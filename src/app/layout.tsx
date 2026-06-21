@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Chess Quest - A Magical Chess Adventure",
   description: "Learn and play chess in a magical fantasy world! Perfect for kids and adults alike.",
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♟️</text></svg>",
+    icon: "/favicon.png",
   },
 };
 
