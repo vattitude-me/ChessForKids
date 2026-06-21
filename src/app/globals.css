@@ -1,26 +1,185 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-primary: #6c5ce7;
+  --color-secondary: #a29bfe;
+  --color-accent: #fd79a8;
+  --color-gold: #fdcb6e;
+  --color-success: #00b894;
+  --color-dark: #2d3436;
+  --color-light: #ffeaa7;
+  --color-bg: #1a1a2e;
+  --color-card: #16213e;
+  --color-surface: #0f3460;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  min-height: 100vh;
+  color: white;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.fantasy-card {
+  background: linear-gradient(145deg, rgba(108, 92, 231, 0.1), rgba(162, 155, 254, 0.05));
+  border: 1px solid rgba(108, 92, 231, 0.3);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.fantasy-card:hover {
+  border-color: rgba(108, 92, 231, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(108, 92, 231, 0.2);
+}
+
+.magic-glow {
+  box-shadow: 0 0 20px rgba(108, 92, 231, 0.4), 0 0 60px rgba(108, 92, 231, 0.1);
+}
+
+.magic-text {
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe, #fd79a8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sparkle-btn {
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.sparkle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(108, 92, 231, 0.4);
+}
+
+.sparkle-btn:active {
+  transform: translateY(0);
+}
+
+.sparkle-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+  transform: rotate(45deg);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(108, 92, 231, 0.4); }
+  50% { box-shadow: 0 0 40px rgba(108, 92, 231, 0.7); }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+}
+
+.nav-link:hover {
+  color: white;
+  background: rgba(108, 92, 231, 0.2);
+}
+
+.nav-link.active {
+  color: white;
+  background: rgba(108, 92, 231, 0.3);
+  border: 1px solid rgba(108, 92, 231, 0.5);
+}
+
+.progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #6c5ce7, #a29bfe);
+  transition: width 0.5s ease;
+}
+
+.badge-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(108, 92, 231, 0.1);
+  border: 1px solid rgba(108, 92, 231, 0.2);
+  text-align: center;
+}
+
+.badge-card.earned {
+  background: rgba(108, 92, 231, 0.2);
+  border-color: rgba(253, 203, 110, 0.5);
+  box-shadow: 0 0 15px rgba(253, 203, 110, 0.2);
+}
+
+.badge-card.locked {
+  opacity: 0.5;
+  filter: grayscale(0.8);
+}
+
+@keyframes celebrate {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.celebrate {
+  animation: celebrate 0.5s ease-in-out;
+}
+
+@media (max-width: 768px) {
+  .chess-board-container {
+    max-width: 95vw;
+  }
 }
