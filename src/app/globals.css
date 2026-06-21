@@ -79,24 +79,43 @@ body {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
   transform: rotate(45deg);
   animation: shimmer 3s infinite;
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%) rotate(45deg); }
-  100% { transform: translateX(100%) rotate(45deg); }
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+
+  100% {
+    transform: translateX(100%) rotate(45deg);
+  }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(108, 92, 231, 0.4); }
-  50% { box-shadow: 0 0 40px rgba(108, 92, 231, 0.7); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(108, 92, 231, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(108, 92, 231, 0.7);
+  }
 }
 
 .float-animation {
@@ -169,8 +188,17 @@ body {
 }
 
 @keyframes ghost-pulse {
-  0%, 100% { opacity: 0.25; transform: scale(0.9); }
-  50% { opacity: 0.45; transform: scale(1.05); }
+
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.9);
+  }
+
+  50% {
+    opacity: 0.45;
+    transform: scale(1.05);
+  }
 }
 
 .ghost-pulse {
@@ -178,9 +206,17 @@ body {
 }
 
 @keyframes celebrate {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .celebrate {
@@ -191,4 +227,61 @@ body {
   .chess-board-container {
     max-width: 95vw;
   }
+}
+
+/* Home page */
+.home-page {
+  background: #0d0a1a;
+}
+
+.hero-section {
+  min-height: 77vh;
+}
+
+.hero-overlay-left {
+  background: linear-gradient(100deg, #0d0a1acc 0%, #0d0a1a90 30%, transparent 55%);
+}
+
+.hero-overlay-bottom {
+  background: linear-gradient(to top, #0d0a1a 0%, #0d0a1acc 8%, transparent 18%);
+}
+
+.hero-title-magic {
+  background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px #ffd70060);
+  padding-bottom: 20px;
+
+}
+
+.cta-button {
+  background: linear-gradient(135deg, #e6a817, #f5c518, #e6a817);
+  color: #1a0e00;
+  box-shadow: 0 4px 20px rgba(245, 197, 24, 0.4);
+  border: 2px solid #ffd75080;
+}
+
+.side-nav-tab {
+  background: linear-gradient(135deg, #2a1a4ecc, #3b2570aa);
+  color: #e8dcc8;
+  border-radius: 6px;
+  border: 1.5px solid #8b6dccaa;
+  min-width: 150px;
+  box-shadow: 0 2px 12px #00000040, inset 0 1px 0 #ffffff10;
+  backdrop-filter: blur(8px);
+}
+
+.feature-strip {
+  background: #100e1c;
+  border-top: 1px solid #ffffff10;
+}
+
+.feature-title {
+  color: #f0e4cc;
+}
+
+.feature-description {
+  color: #a0a0b0;
 }
