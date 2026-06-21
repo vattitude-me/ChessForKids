@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Chess Quest - A Magical Chess Adventure
+
+A fantasy-themed chess learning app for kids and adults, built with Next.js, TypeScript, and Tailwind CSS.
+
+## Features
+
+- **Adaptive AI** - 7 difficulty levels (Apprentice to Dragon Lord) that auto-adjust based on performance
+- **Interactive Tutorials** - 10 lessons covering all pieces, special moves, and tactics
+- **Puzzle Mode** - Chess puzzles with hints, themed around magical challenges
+- **Progress Tracking** - XP system, badges, streaks, and detailed stats
+- **Fantasy Theme** - Magical wizards, dragons, and enchanted boards
+- **Responsive** - Works on desktop, tablet, and mobile
+
+## Tech Stack
+
+- Next.js 16 (App Router)
+- TypeScript
+- Tailwind CSS
+- chess.js (game logic)
+- react-chessboard (board UI)
+- Zustand (state management)
+- canvas-confetti (celebrations)
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This app is configured for Vercel deployment. Connect the GitHub repo to Vercel for automatic deployments.
 
-## Learn More
+## Difficulty Levels
 
-To learn more about Next.js, take a look at the following resources:
+| Level | Name | Ages | AI Behavior |
+|-------|------|------|-------------|
+| 1 | Apprentice | 3+ | Very random, frequent blunders |
+| 2 | Squire | 5+ | Mostly random with some logic |
+| 3 | Knight | 7+ | Mix of random and calculated |
+| 4 | Wizard | 9+ | Strategic with occasional mistakes |
+| 5 | Enchanter | 11+ | Strong play, rare mistakes |
+| 6 | Archmage | 13+ | Very strong, deep calculation |
+| 7 | Dragon Lord | 16+ | Near-optimal play |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The AI adapts automatically based on win/loss ratio, leveling up or down to keep games fun and challenging.
