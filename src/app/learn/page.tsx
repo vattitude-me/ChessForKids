@@ -245,6 +245,17 @@ export default function LearnPage() {
   );
 }
 
+const GHOST_PIECE_UNICODE: Record<string, string> = {
+  K: '♔', Q: '♕', R: '♖', B: '♗', N: '♞', P: '♙',
+  k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟',
+};
+
+function squareToCoords(square: string): { col: number; row: number } {
+  const col = square.charCodeAt(0) - 'a'.charCodeAt(0);
+  const row = 8 - parseInt(square[1]);
+  return { col, row };
+}
+
 function LessonStepView({ step }: { step: TutorialStep }) {
   const squareStyles: Record<string, React.CSSProperties> = {};
 
@@ -271,7 +282,7 @@ function LessonStepView({ step }: { step: TutorialStep }) {
       </p>
 
       {step.fen && (
-        <div className="chess-board-container w-full max-w-[min(80vw,380px)] lg:max-w-[min(75vw,500px)] mx-auto aspect-square magic-glow rounded-xl overflow-hidden">
+        <div className="chess-board-container w-full max-w-[min(80vw,380px)] lg:max-w-[min(75vw,500px)] mx-auto aspect-square magic-glow rounded-xl overflow-hidden relative">
           <Chessboard
             options={{
               position: step.fen,
@@ -285,6 +296,28 @@ function LessonStepView({ step }: { step: TutorialStep }) {
               animationDurationInMs: 300,
             }}
           />
+          {step.ghostPiece && step.highlightSquares && (
+            <div className="absolute inset-0 pointer-events-none">
+              {step.highlightSquares.map(sq => {
+                const { col, row } = squareToCoords(sq);
+                return (
+                  <span
+                    key={sq}
+                    className="absolute opacity-30 text-yellow-200 flex items-center justify-center ghost-pulse"
+                    style={{
+                      left: `${col * 12.5}%`,
+                      top: `${row * 12.5}%`,
+                      width: '12.5%',
+                      height: '12.5%',
+                      fontSize: 'min(4vw, 32px)',
+                    }}
+                  >
+                    {GHOST_PIECE_UNICODE[step.ghostPiece!]}
+                  </span>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>

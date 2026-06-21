@@ -168,6 +168,15 @@ body {
   filter: grayscale(0.8);
 }
 
+@keyframes ghost-pulse {
+  0%, 100% { opacity: 0.25; transform: scale(0.9); }
+  50% { opacity: 0.45; transform: scale(1.05); }
+}
+
+.ghost-pulse {
+  animation: ghost-pulse 2s ease-in-out infinite;
+}
+
 @keyframes celebrate {
   0% { transform: scale(1); }
   50% { transform: scale(1.2); }

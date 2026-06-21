@@ -14,6 +14,7 @@ export interface TutorialStep {
   fen?: string;
   highlightSquares?: string[];
   arrows?: [string, string][];
+  ghostPiece?: string;
 }
 
 export const tutorials: TutorialLesson[] = [
@@ -95,6 +96,8 @@ export const tutorials: TutorialLesson[] = [
         text: 'The Rook can slide any number of squares along a row or column. Nothing stops it except other pieces!',
         fen: '8/8/8/8/3R4/8/8/8 w - - 0 1',
         highlightSquares: ['d1', 'd2', 'd3', 'd5', 'd6', 'd7', 'd8', 'a4', 'b4', 'c4', 'e4', 'f4', 'g4', 'h4'],
+        arrows: [['d4', 'd8'], ['d4', 'd1'], ['d4', 'a4'], ['d4', 'h4']],
+        ghostPiece: 'R',
       },
     ],
   },
@@ -116,6 +119,8 @@ export const tutorials: TutorialLesson[] = [
         text: 'The Bishop slides diagonally in any direction. It always stays on the same color square!',
         fen: '8/8/8/8/3B4/8/8/8 w - - 0 1',
         highlightSquares: ['a1', 'b2', 'c3', 'e5', 'f6', 'g7', 'h8', 'a7', 'b6', 'c5', 'e3', 'f2', 'g1'],
+        arrows: [['d4', 'h8'], ['d4', 'a1'], ['d4', 'a7'], ['d4', 'g1']],
+        ghostPiece: 'B',
       },
     ],
   },
@@ -137,6 +142,8 @@ export const tutorials: TutorialLesson[] = [
         text: 'The Knight jumps in an L-shape! It can leap over any piece in its way. Count: 2 squares one way, then 1 square to the side.',
         fen: '8/8/8/8/3N4/8/8/8 w - - 0 1',
         highlightSquares: ['b3', 'b5', 'c2', 'c6', 'e2', 'e6', 'f3', 'f5'],
+        arrows: [['d4', 'b3'], ['d4', 'b5'], ['d4', 'c2'], ['d4', 'c6'], ['d4', 'e2'], ['d4', 'e6'], ['d4', 'f3'], ['d4', 'f5']],
+        ghostPiece: 'N',
       },
     ],
   },
@@ -158,6 +165,8 @@ export const tutorials: TutorialLesson[] = [
         text: 'The Queen can move like a Rook (straight) AND a Bishop (diagonal). She controls so many squares!',
         fen: '8/8/8/8/3Q4/8/8/8 w - - 0 1',
         highlightSquares: ['d1', 'd2', 'd3', 'd5', 'd6', 'd7', 'd8', 'a4', 'b4', 'c4', 'e4', 'f4', 'g4', 'h4', 'a1', 'b2', 'c3', 'e5', 'f6', 'g7', 'h8', 'a7', 'b6', 'c5', 'e3', 'f2', 'g1'],
+        arrows: [['d4', 'd8'], ['d4', 'd1'], ['d4', 'a4'], ['d4', 'h4'], ['d4', 'h8'], ['d4', 'a1'], ['d4', 'a7'], ['d4', 'g1']],
+        ghostPiece: 'Q',
       },
     ],
   },
@@ -179,6 +188,8 @@ export const tutorials: TutorialLesson[] = [
         text: 'The King moves one square in any direction. He must be protected at all times!',
         fen: '8/8/8/8/3K4/8/8/8 w - - 0 1',
         highlightSquares: ['c3', 'c4', 'c5', 'd3', 'd5', 'e3', 'e4', 'e5'],
+        arrows: [['d4', 'c5'], ['d4', 'd5'], ['d4', 'e5'], ['d4', 'c4'], ['d4', 'e4'], ['d4', 'c3'], ['d4', 'd3'], ['d4', 'e3']],
+        ghostPiece: 'K',
       },
       {
         type: 'text',
