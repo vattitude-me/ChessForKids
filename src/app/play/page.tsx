@@ -38,6 +38,7 @@ export default function PlayPage() {
   const [capturedPieces, setCapturedPieces] = useState<{ white: string[]; black: string[] }>({ white: [], black: [] });
   const [gameResult, setGameResult] = useState<string | null>(null);
   const [gameKey, setGameKey] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const currentDifficulty = difficultyLevels[currentDifficultyIndex];
   const xp = stats.xp;
@@ -102,13 +103,13 @@ export default function PlayPage() {
 
       {/* Custom play-page nav header with same dark background as home */}
       <header className="play-nav-header shrink-0 relative z-20">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 py-3">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-10 py-3">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <Image src="/logo.png" alt="Chess for Kids" width={60} height={60} className="object-contain" />
-              <span className="font-bold text-2xl lg:text-3xl" style={{ color: '#ffffff' }}>
+              <Image src="/logo.png" alt="Chess for Kids" width={40} height={40} className="object-contain md:w-[60px] md:h-[60px]" />
+              <span className="font-bold text-xl md:text-2xl lg:text-3xl" style={{ color: '#ffffff' }}>
                 <span style={{ color: '#ffd700' }}>Chess</span>
-                <span className="text-sm lg:text-base block" style={{ color: '#c0b0ff' }}>✦ for Kids ✦</span>
+                <span className="text-xs md:text-sm lg:text-base block" style={{ color: '#c0b0ff' }}>✦ for Kids ✦</span>
               </span>
             </Link>
 
@@ -124,9 +125,18 @@ export default function PlayPage() {
               })}
             </div>
 
+            {/* Mobile menu button */}
+            <button
+              className="lg:hidden flex items-center justify-center w-10 h-10 rounded-xl"
+              style={{ background: '#ffffff15' }}
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e0e0e0" strokeWidth="2.5" strokeLinecap="round"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
+            </button>
+
             <Link
               href="/play"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-base lg:text-lg transition-all duration-200 hover:scale-105"
+              className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-base lg:text-lg transition-all duration-200 hover:scale-105"
               style={{
                 background: 'linear-gradient(135deg, #3b2570, #5b3d99)',
                 color: '#e8dcc8',
@@ -140,11 +150,141 @@ export default function PlayPage() {
         </div>
       </header>
 
+      {/* Mobile drawer overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileMenuOpen(false)} />
+          <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between px-4 py-4 border-b border-[#e8dff5]">
+              <span className="font-bold text-lg text-[#4a3b6b]">Menu</span>
+              <button onClick={() => setMobileMenuOpen(false)} className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#f5f0ff]">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4a3b6b" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            <div className="p-4 space-y-4">
+              {/* Nav links */}
+              <div className="space-y-2 pb-4 border-b border-[#e8dff5]">
+                {['Home', 'Lessons', 'Puzzles', 'Progress'].map((label) => {
+                  const href = label === 'Home' ? '/' : `/${label.toLowerCase()}`;
+                  const isActive = pathname === href;
+                  return (
+                    <Link key={label} href={href} className="block px-3 py-2.5 rounded-xl font-semibold text-base transition-colors" style={{ color: isActive ? '#9b7fd4' : '#4a3b6b', background: isActive ? '#f5f0ff' : 'transparent' }}>
+                      {label}{isActive && ' ✦'}
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* Settings */}
+              <div className="space-y-3 pb-4 border-b border-[#e8dff5]">
+                <h4 className="text-xs font-bold text-[#9b7fd4] tracking-wider">GAME SETTINGS</h4>
+                <div>
+                  <label className="text-sm text-[#5a4b7a] mb-1.5 block font-semibold">Mode</label>
+                  <div className="flex flex-col gap-1.5">
+                    <GameModeButton icon="🖥️" label="Play vs Computer" active={gameMode === 'computer'} onClick={() => setGameMode('computer')} />
+                    <GameModeButton icon="👤" label="Play vs Friend" active={gameMode === 'friend'} onClick={() => setGameMode('friend')} disabled />
+                    <GameModeButton icon="🌐" label="Online Players" active={gameMode === 'online'} onClick={() => setGameMode('online')} disabled />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-[#5a4b7a] mb-1.5 block font-semibold">Difficulty</label>
+                  <div className="flex flex-col gap-1.5">
+                    {difficultyLevels.slice(0, 4).map((level, index) => {
+                      const isUnlocked = index <= stats.highestDifficultyBeaten + 1;
+                      return (
+                        <DifficultyOption
+                          key={level.name}
+                          level={level}
+                          selected={index === currentDifficultyIndex}
+                          unlocked={isUnlocked}
+                          onClick={() => { if (isUnlocked) setDifficulty(index); }}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-[#5a4b7a] mb-1.5 block font-semibold">Play As</label>
+                  <div className="flex gap-2">
+                    <button onClick={() => setPlayerColor('white')} className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold border-2 ${playerColor === 'white' ? 'bg-white text-[#4a3b6b] border-[#9b7fd4] shadow-md' : 'bg-[#f8f4ff] text-[#7a6b9a] border-[#e8dff5]'}`}>White</button>
+                    <button onClick={() => setPlayerColor('black')} className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold border-2 ${playerColor === 'black' ? 'bg-[#3a2d5c] text-white border-[#9b7fd4] shadow-md' : 'bg-[#f8f4ff] text-[#7a6b9a] border-[#e8dff5]'}`}>Black</button>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-[#5a4b7a] mb-1.5 block font-semibold">Board Theme</label>
+                  <div className="flex gap-3">
+                    {(Object.keys(boardThemes) as BoardTheme[]).map((theme) => (
+                      <button key={theme} onClick={() => setBoardTheme(theme)} className={`w-9 h-9 rounded-lg overflow-hidden border-2 transition-all ${boardTheme === theme ? 'border-[#9b7fd4] scale-110 shadow-lg' : 'border-[#e8dff5]'}`} title={boardThemes[theme].label}>
+                        <div className="w-full h-1/2" style={{ backgroundColor: boardThemes[theme].light }} />
+                        <div className="w-full h-1/2" style={{ backgroundColor: boardThemes[theme].dark }} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Move List */}
+              <div className="pb-4 border-b border-[#e8dff5]">
+                <h4 className="text-xs font-bold text-[#9b7fd4] tracking-wider mb-2">MOVE LIST</h4>
+                {moveHistory.length > 0 ? (
+                  <div className="space-y-1 max-h-36 overflow-y-auto">
+                    {Array.from({ length: Math.ceil(moveHistory.length / 2) }, (_, i) => (
+                      <div key={i} className="flex text-sm">
+                        <span className="text-[#9b8fb5] w-6 font-semibold">{i + 1}.</span>
+                        <span className="text-[#4a3b6b] flex-1 font-semibold">{moveHistory[i * 2]}</span>
+                        {moveHistory[i * 2 + 1] && <span className="text-[#6b5b8a] flex-1">{moveHistory[i * 2 + 1]}</span>}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-[#9b8fb5]">No moves yet</p>
+                )}
+              </div>
+
+              {/* Captured Pieces */}
+              <div className="pb-4 border-b border-[#e8dff5]">
+                <h4 className="text-xs font-bold text-[#9b7fd4] tracking-wider mb-2">CAPTURED PIECES</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full bg-[#3a3a3a] border-2 border-[#555] inline-block"></span>
+                    <span className="text-sm text-[#5a4b7a] font-semibold">Black</span>
+                    <span className="text-base ml-1 text-[#4a3b6b]">{capturedPieces.black.join(' ') || '—'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full bg-white border-2 border-[#bbb] inline-block"></span>
+                    <span className="text-sm text-[#5a4b7a] font-semibold">White</span>
+                    <span className="text-base ml-1 text-[#4a3b6b]">{capturedPieces.white.join(' ') || '—'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* XP */}
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">✨</span>
+                  <span className="text-base font-bold text-[#6c5ce7]">{xp} XP</span>
+                </div>
+                <div className="play-progress-bar">
+                  <div className="play-progress-fill" style={{ width: `${(xp % 200) / 2}%` }} />
+                </div>
+                <p className="text-xs text-[#7a6b9a] mt-1.5 font-medium">Level {stats.level} • {200 - (xp % 200)} XP to next level</p>
+              </div>
+
+              {/* New Game button */}
+              <button onClick={() => { startNewGame(); setMobileMenuOpen(false); }} className="play-start-btn w-full mt-2">
+                <span className="mr-2">⚔️</span> New Game
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main 3-column layout */}
       <div className="relative z-10 flex-1 flex flex-col lg:flex-row gap-3 xl:gap-4 px-3 xl:px-5 pb-3 min-h-0">
 
-        {/* Left Sidebar */}
-        <aside className="w-full lg:w-60 xl:w-68 2xl:w-76 shrink-0 lg:overflow-y-auto lg:max-h-full flex flex-col gap-3">
+        {/* Left Sidebar - hidden on mobile */}
+        <aside className="hidden lg:flex w-60 xl:w-68 2xl:w-76 shrink-0 lg:overflow-y-auto lg:max-h-full flex-col gap-3">
           {/* Game Mode - Accordion */}
           <div className="play-card overflow-hidden">
             {openSection === 'game' ? (
@@ -385,8 +525,8 @@ export default function PlayPage() {
           )}
         </main>
 
-        {/* Right Sidebar */}
-        <aside className="w-full lg:w-60 xl:w-68 2xl:w-76 shrink-0 lg:overflow-y-auto lg:max-h-full flex flex-col gap-3">
+        {/* Right Sidebar - hidden on mobile */}
+        <aside className="hidden lg:flex w-60 xl:w-68 2xl:w-76 shrink-0 lg:overflow-y-auto lg:max-h-full flex-col gap-3">
           {/* Game Info */}
           <div className="play-card">
             <h3 className="play-card-title">GAME INFO</h3>
