@@ -10,12 +10,13 @@ import confetti from 'canvas-confetti';
 interface ChessBoardProps {
   difficulty: DifficultyLevel;
   onGameEnd: (result: 'win' | 'loss' | 'draw') => void;
+  onMove?: (move: { san: string; color: 'w' | 'b'; captured?: string }) => void;
   playerColor?: 'white' | 'black';
   boardTheme?: { dark: string; light: string; label: string };
   minimal?: boolean;
 }
 
-export default function ChessBoard({ difficulty, onGameEnd, playerColor = 'white', boardTheme, minimal = false }: ChessBoardProps) {
+export default function ChessBoard({ difficulty, onGameEnd, onMove, playerColor = 'white', boardTheme, minimal = false }: ChessBoardProps) {
   const [game, setGame] = useState(new Chess());
   const [gameOver, setGameOver] = useState(false);
   const [gameResult, setGameResult] = useState<string>('');
@@ -79,15 +80,18 @@ export default function ChessBoard({ difficulty, onGameEnd, playerColor = 'white
 
       if (aiMove) {
         const newGame = new Chess(fen);
-        newGame.move(aiMove);
+        const madeMove = newGame.move(aiMove);
         updateGame(newGame);
         setMoveHistory(prev => [...prev, aiMove.san]);
         setLastMove({ from: aiMove.from, to: aiMove.to });
+        if (madeMove) {
+          onMove?.({ san: madeMove.san, color: madeMove.color, captured: madeMove.captured });
+        }
         checkGameOver(newGame);
       }
       setThinking(false);
     }, 500 + Math.random() * 800);
-  }, [difficulty, aiColor, checkGameOver]);
+  }, [difficulty, aiColor, checkGameOver, onMove]);
 
   useEffect(() => {
     if (playerColor === 'black' && game.turn() === 'w' && !gameOver && moveHistory.length === 0) {
@@ -129,6 +133,7 @@ export default function ChessBoard({ difficulty, onGameEnd, playerColor = 'white
       setLastMove({ from, to });
       setSelectedSquare(null);
       setLegalMoves([]);
+      onMove?.({ san: move.san, color: move.color, captured: move.captured });
       checkGameOver(newGame);
 
       if (!newGame.isGameOver()) {

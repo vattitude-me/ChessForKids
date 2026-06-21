@@ -23,6 +23,7 @@ export interface PlayerStats {
   badges: Badge[];
   xp: number;
   level: number;
+  highestDifficultyBeaten: number;
 }
 
 export interface GameState {
@@ -71,6 +72,7 @@ const defaultStats: PlayerStats = {
   badges: [],
   xp: 0,
   level: 1,
+  highestDifficultyBeaten: -1,
 };
 
 export const useGameStore = create<GameState>()(
@@ -105,6 +107,7 @@ export const useGameStore = create<GameState>()(
           bestStreak: Math.max(state.stats.bestStreak, state.stats.currentStreak + 1),
           lastPlayedDate: new Date().toISOString(),
           xp: state.stats.xp + 50,
+          highestDifficultyBeaten: Math.max(state.stats.highestDifficultyBeaten, state.currentDifficultyIndex),
         };
 
         const newBadges = [...newStats.badges];
