@@ -750,18 +750,103 @@ body:has(.play-page-container) > main {
   }
 
   .play-board-wrapper-light {
-    max-width: min(100%, calc(100vh - 200px));
-    max-height: min(100%, calc(100vh - 200px));
+    max-width: min(48vw, calc(100vh - 14vw));
+    max-height: min(48vw, calc(100vh - 14vw));
   }
 
   .play-page-container > .relative.flex-1 {
     gap: 1.2vw;
     padding-left: 1.5vw;
     padding-right: 1.5vw;
+    padding-top: 5vw;
+    padding-bottom: 1vw;
   }
 
   .play-page-container .play-action-btn {
     font-size: 0.75vw;
     padding: 0.5vw 1vw;
+  }
+
+  /* Sidebar accordion buttons — scale labels and values */
+  .play-page-container aside button {
+    padding: 0.6vw 0.8vw;
+    gap: 0.6vw;
+    border-radius: 0.6vw;
+  }
+
+  .play-page-container aside .text-xs {
+    font-size: 0.55vw;
+  }
+
+  .play-page-container aside .text-sm {
+    font-size: 0.65vw;
+  }
+
+  .play-page-container aside .text-base {
+    font-size: 0.8vw;
+  }
+
+  .play-page-container aside .text-xl {
+    font-size: 1vw;
+  }
+
+  .play-page-container aside .text-lg {
+    font-size: 0.9vw;
+  }
+
+  /* Sidebar gaps between cards */
+  .play-page-container aside {
+    gap: 0.5vw;
+  }
+
+  /* XP progress bar */
+  .play-page-container aside .play-progress-bar {
+    height: 0.35vw;
+    border-radius: 0.2vw;
+  }
+
+  /* SVG icons in sidebar */
+  .play-page-container aside svg {
+    width: 0.8vw;
+    height: 0.8vw;
+  }
+
+  /* Difficulty badge circle */
+  .play-page-container aside .w-7 {
+    width: 1.4vw;
+    height: 1.4vw;
+  }
+
+  /* Captured pieces indicators */
+  .play-page-container aside .w-4.h-4.rounded-full {
+    width: 0.8vw;
+    height: 0.8vw;
+  }
+
+  /* VS header above board */
+  .play-page-container main > .flex.items-center.justify-center.gap-3.mb-2 {
+    padding: 0.3vw 0.8vw;
+    gap: 0.5vw;
+    margin-bottom: 0.5vw;
+    border-radius: 2vw;
+  }
+
+  .play-page-container main > .flex.items-center.justify-center.gap-3.mb-2 .text-xs {
+    font-size: 0.6vw;
+  }
+
+  .play-page-container main > .flex.items-center.justify-center.gap-3.mb-2 .text-sm {
+    font-size: 0.7vw;
+  }
+
+  /* Action buttons (Resign/Draw) */
+  .play-page-container main > .flex.gap-3.mt-3 {
+    gap: 0.6vw;
+    margin-top: 0.6vw;
+  }
+
+  /* Game result text */
+  .play-page-container main > .mt-4.text-center .text-3xl {
+    font-size: 1.5vw;
   }
 }

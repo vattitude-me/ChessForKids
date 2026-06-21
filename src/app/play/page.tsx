@@ -212,7 +212,7 @@ export default function PlayPage() {
                 <div className="play-progress-bar">
                   <div className="play-progress-fill" style={{ width: `${(xp % 200) / 2}%` }} />
                 </div>
-                <p className="text-xs text-[#7a6b9a] mt-1.5 font-medium">Level {stats.level} • {200 - (xp % 200)} XP to next level</p>
+                <p className="text-sm text-[#7a6b9a] mt-1.5 font-medium">Level {stats.level} • {200 - (xp % 200)} XP to next level</p>
               </div>
 
               {/* New Game button */}
@@ -270,7 +270,7 @@ export default function PlayPage() {
               >
                 <span className="text-xl">{gameMode === 'computer' ? '🖥️' : gameMode === 'friend' ? '👤' : '🌐'}</span>
                 <div className="flex-1 text-left">
-                  <span className="text-[10px] font-bold text-[#9b7fd4] tracking-wider block">GAME</span>
+                  <span className="text-xs font-bold text-[#9b7fd4] tracking-wider block">GAME</span>
                   <span className="font-bold text-base text-[#4a3b6b]">
                     {gameMode === 'computer' ? 'Play vs Computer' : gameMode === 'friend' ? 'Play vs Friend' : 'Online Players'}
                   </span>
@@ -315,7 +315,7 @@ export default function PlayPage() {
                   <span className="text-white text-xs font-bold">{currentDifficultyIndex + 1}</span>
                 </span>
                 <div className="flex-1 text-left">
-                  <span className="text-[10px] font-bold text-[#9b7fd4] tracking-wider block">DIFFICULTY</span>
+                  <span className="text-xs font-bold text-[#9b7fd4] tracking-wider block">DIFFICULTY</span>
                   <span className="font-bold text-base text-[#4a3b6b]">{currentDifficulty.label}</span>
                 </div>
                 <svg className="w-4 h-4 text-[#9b7fd4]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
@@ -387,7 +387,7 @@ export default function PlayPage() {
               >
                 <span className="text-xl">⚙️</span>
                 <div className="flex-1 text-left">
-                  <span className="text-[10px] font-bold text-[#9b7fd4] tracking-wider block">SETTINGS</span>
+                  <span className="text-xs font-bold text-[#9b7fd4] tracking-wider block">SETTINGS</span>
                   <span className="font-bold text-base text-[#4a3b6b]">{playerColor === 'white' ? 'White' : 'Black'} • {boardThemes[boardTheme].label}</span>
                 </div>
                 <svg className="w-4 h-4 text-[#9b7fd4]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
@@ -397,7 +397,7 @@ export default function PlayPage() {
 
           {/* New Game Button */}
           <button onClick={startNewGame} className="play-start-btn w-full">
-            <span className="mr-2">⚔️</span> New Game
+            <span className="mr-2"></span> New Game
           </button>
 
           {/* Divider */}
@@ -451,7 +451,7 @@ export default function PlayPage() {
             <div className="play-progress-bar">
               <div className="play-progress-fill" style={{ width: `${(xp % 200) / 2}%` }} />
             </div>
-            <p className="text-xs text-[#7a6b9a] mt-1.5 font-medium">Level {stats.level} • {200 - (xp % 200)} XP to next level</p>
+            <p className="text-sm text-[#7a6b9a] mt-1.5 font-medium">Level {stats.level} • {200 - (xp % 200)} XP to next level</p>
           </div>
         </aside>
 
