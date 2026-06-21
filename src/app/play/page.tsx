@@ -86,13 +86,13 @@ export default function PlayPage() {
 
   return (
     <div className="play-page-light h-screen flex flex-col relative overflow-hidden play-page-container">
-      {/* Fantasy background - same as home hero */}
+      {/* Hero image blur background */}
       <div className="absolute inset-0 z-0">
         <Image
           src="/hero_image.png"
           alt=""
           fill
-          className="object-cover object-center opacity-20 blur-sm scale-105"
+          className="object-cover object-center opacity-40 blur-sm scale-105"
           priority
         />
         <div className="play-bg-gradient absolute inset-0" />
@@ -224,11 +224,11 @@ export default function PlayPage() {
         </div>
       )}
 
-      {/* Main 3-column layout */}
-      <div className="relative z-10 flex-1 flex flex-col lg:flex-row gap-3 xl:gap-4 px-3 xl:px-5 pt-16 md:pt-20 pb-3 min-h-0">
+      {/* Main layout: left sidebar + clean board area */}
+      <div className="relative z-10 flex-1 flex flex-col lg:flex-row gap-3 xl:gap-4 px-3 xl:px-5 pt-20 md:pt-24 pb-3 min-h-0">
 
-        {/* Left Sidebar - hidden on mobile */}
-        <aside className="hidden lg:flex w-60 xl:w-68 2xl:w-76 shrink-0 lg:overflow-y-auto lg:max-h-full flex-col gap-3">
+        {/* Left Sidebar - all controls and info panels */}
+        <aside className="hidden lg:flex w-72 xl:w-80 2xl:w-88 shrink-0 lg:overflow-y-auto lg:max-h-full flex-col gap-2.5">
           {/* Game Mode - Accordion */}
           <div className="play-card overflow-hidden">
             {openSection === 'game' ? (
@@ -237,8 +237,8 @@ export default function PlayPage() {
                   className="w-full flex items-center justify-between px-4 py-3 bg-[#9b7fd4] rounded-xl mb-3 cursor-pointer"
                   onClick={() => setOpenSection(null)}
                 >
-                  <span className="text-white font-bold text-base tracking-wide">GAME</span>
-                  <svg className="w-5 h-5 text-white rotate-180" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                  <span className="text-white font-bold text-sm tracking-wide">GAME</span>
+                  <svg className="w-4 h-4 text-white rotate-180" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
                 </button>
                 <div className="flex flex-col gap-2">
                   <GameModeButton
@@ -265,17 +265,17 @@ export default function PlayPage() {
               </>
             ) : (
               <button
-                className="w-full flex items-center gap-3 px-4 py-3.5 cursor-pointer hover:bg-[#f5f0ff] rounded-xl transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#f5f0ff] rounded-xl transition-colors"
                 onClick={() => setOpenSection('game')}
               >
-                <span className="text-2xl">{gameMode === 'computer' ? '🖥️' : gameMode === 'friend' ? '👤' : '🌐'}</span>
+                <span className="text-xl">{gameMode === 'computer' ? '🖥️' : gameMode === 'friend' ? '👤' : '🌐'}</span>
                 <div className="flex-1 text-left">
-                  <span className="text-xs font-bold text-[#9b7fd4] tracking-wider block">GAME</span>
-                  <span className="font-bold text-lg text-[#4a3b6b]">
+                  <span className="text-[10px] font-bold text-[#9b7fd4] tracking-wider block">GAME</span>
+                  <span className="font-bold text-base text-[#4a3b6b]">
                     {gameMode === 'computer' ? 'Play vs Computer' : gameMode === 'friend' ? 'Play vs Friend' : 'Online Players'}
                   </span>
                 </div>
-                <svg className="w-5 h-5 text-[#9b7fd4]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                <svg className="w-4 h-4 text-[#9b7fd4]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
               </button>
             )}
           </div>
@@ -288,8 +288,8 @@ export default function PlayPage() {
                   className="w-full flex items-center justify-between px-4 py-3 bg-[#9b7fd4] rounded-xl mb-3 cursor-pointer"
                   onClick={() => setOpenSection(null)}
                 >
-                  <span className="text-white font-bold text-base tracking-wide">DIFFICULTY</span>
-                  <svg className="w-5 h-5 text-white rotate-180" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                  <span className="text-white font-bold text-sm tracking-wide">DIFFICULTY</span>
+                  <svg className="w-4 h-4 text-white rotate-180" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
                 </button>
                 <div className="flex flex-col gap-2">
                   {difficultyLevels.slice(0, 4).map((level, index) => {
@@ -308,17 +308,17 @@ export default function PlayPage() {
               </>
             ) : (
               <button
-                className="w-full flex items-center gap-3 px-4 py-3.5 cursor-pointer hover:bg-[#f5f0ff] rounded-xl transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#f5f0ff] rounded-xl transition-colors"
                 onClick={() => setOpenSection('difficulty')}
               >
-                <span className="w-8 h-8 rounded-full bg-[#9b7fd4] flex items-center justify-center shrink-0">
-                  <span className="text-white text-sm font-bold">{currentDifficultyIndex + 1}</span>
+                <span className="w-7 h-7 rounded-full bg-[#9b7fd4] flex items-center justify-center shrink-0">
+                  <span className="text-white text-xs font-bold">{currentDifficultyIndex + 1}</span>
                 </span>
                 <div className="flex-1 text-left">
-                  <span className="text-xs font-bold text-[#9b7fd4] tracking-wider block">DIFFICULTY</span>
-                  <span className="font-bold text-lg text-[#4a3b6b]">{currentDifficulty.label}</span>
+                  <span className="text-[10px] font-bold text-[#9b7fd4] tracking-wider block">DIFFICULTY</span>
+                  <span className="font-bold text-base text-[#4a3b6b]">{currentDifficulty.label}</span>
                 </div>
-                <svg className="w-5 h-5 text-[#9b7fd4]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                <svg className="w-4 h-4 text-[#9b7fd4]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
               </button>
             )}
           </div>
@@ -331,16 +331,16 @@ export default function PlayPage() {
                   className="w-full flex items-center justify-between px-4 py-3 bg-[#9b7fd4] rounded-xl mb-3 cursor-pointer"
                   onClick={() => setOpenSection(null)}
                 >
-                  <span className="text-white font-bold text-base tracking-wide">SETTINGS</span>
-                  <svg className="w-5 h-5 text-white rotate-180" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                  <span className="text-white font-bold text-sm tracking-wide">SETTINGS</span>
+                  <svg className="w-4 h-4 text-white rotate-180" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
                 </button>
                 <div>
                   <div className="mb-4">
-                    <label className="text-base text-[#5a4b7a] mb-2 block font-semibold">Play As</label>
+                    <label className="text-sm text-[#5a4b7a] mb-2 block font-semibold">Play As</label>
                     <div className="flex gap-2">
                       <button
                         onClick={() => setPlayerColor('white')}
-                        className={`flex-1 py-2.5 px-4 rounded-xl text-base font-bold transition-all border-2 ${
+                        className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold transition-all border-2 ${
                           playerColor === 'white'
                             ? 'bg-white text-[#4a3b6b] border-[#9b7fd4] shadow-md'
                             : 'bg-[#f8f4ff] text-[#7a6b9a] border-[#e8dff5] hover:border-[#c4b5e0]'
@@ -350,7 +350,7 @@ export default function PlayPage() {
                       </button>
                       <button
                         onClick={() => setPlayerColor('black')}
-                        className={`flex-1 py-2.5 px-4 rounded-xl text-base font-bold transition-all border-2 ${
+                        className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold transition-all border-2 ${
                           playerColor === 'black'
                             ? 'bg-[#3a2d5c] text-white border-[#9b7fd4] shadow-md'
                             : 'bg-[#f8f4ff] text-[#7a6b9a] border-[#e8dff5] hover:border-[#c4b5e0]'
@@ -361,13 +361,13 @@ export default function PlayPage() {
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="text-base text-[#5a4b7a] mb-2 block font-semibold">Board Theme</label>
+                    <label className="text-sm text-[#5a4b7a] mb-2 block font-semibold">Board Theme</label>
                     <div className="flex gap-3">
                       {(Object.keys(boardThemes) as BoardTheme[]).map((theme) => (
                         <button
                           key={theme}
                           onClick={() => setBoardTheme(theme)}
-                          className={`w-10 h-10 rounded-xl overflow-hidden border-2 transition-all ${
+                          className={`w-9 h-9 rounded-xl overflow-hidden border-2 transition-all ${
                             boardTheme === theme ? 'border-[#9b7fd4] scale-110 shadow-lg' : 'border-[#e8dff5] hover:border-[#c4b5e0]'
                           }`}
                           title={boardThemes[theme].label}
@@ -382,45 +382,88 @@ export default function PlayPage() {
               </>
             ) : (
               <button
-                className="w-full flex items-center gap-3 px-4 py-3.5 cursor-pointer hover:bg-[#f5f0ff] rounded-xl transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#f5f0ff] rounded-xl transition-colors"
                 onClick={() => setOpenSection('settings')}
               >
-                <span className="text-2xl">⚙️</span>
+                <span className="text-xl">⚙️</span>
                 <div className="flex-1 text-left">
-                  <span className="text-xs font-bold text-[#9b7fd4] tracking-wider block">SETTINGS</span>
-                  <span className="font-bold text-lg text-[#4a3b6b]">{playerColor === 'white' ? 'White' : 'Black'} • {boardThemes[boardTheme].label}</span>
+                  <span className="text-[10px] font-bold text-[#9b7fd4] tracking-wider block">SETTINGS</span>
+                  <span className="font-bold text-base text-[#4a3b6b]">{playerColor === 'white' ? 'White' : 'Black'} • {boardThemes[boardTheme].label}</span>
                 </div>
-                <svg className="w-5 h-5 text-[#9b7fd4]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                <svg className="w-4 h-4 text-[#9b7fd4]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
               </button>
             )}
           </div>
 
+          {/* New Game Button */}
           <button onClick={startNewGame} className="play-start-btn w-full">
             <span className="mr-2">⚔️</span> New Game
           </button>
+
+          {/* Divider */}
+          <div className="border-t border-[#e8dff5]/50 my-1" />
+
+          {/* Move List */}
+          <div className="play-card min-h-0">
+            <h3 className="play-card-title text-xs">MOVE LIST</h3>
+            {moveHistory.length > 0 ? (
+              <div className="space-y-1 max-h-32 overflow-y-auto pr-1">
+                {Array.from({ length: Math.ceil(moveHistory.length / 2) }, (_, i) => (
+                  <div key={i} className="flex text-sm">
+                    <span className="text-[#9b8fb5] w-6 font-semibold">{i + 1}.</span>
+                    <span className="text-[#4a3b6b] flex-1 font-semibold">{moveHistory[i * 2]}</span>
+                    {moveHistory[i * 2 + 1] && (
+                      <span className="text-[#6b5b8a] flex-1">{moveHistory[i * 2 + 1]}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center py-2 text-[#9b8fb5]">
+                <p className="text-xs">Moves will appear here</p>
+              </div>
+            )}
+          </div>
+
+          {/* Captured Pieces */}
+          <div className="play-card">
+            <h3 className="play-card-title text-xs">CAPTURED PIECES</h3>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-4 h-4 rounded-full bg-[#3a3a3a] border-2 border-[#555] inline-block"></span>
+                <span className="text-sm text-[#5a4b7a] font-semibold">Black</span>
+                <span className="text-base ml-1 text-[#4a3b6b]">{capturedPieces.black.join(' ') || '—'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-4 h-4 rounded-full bg-white border-2 border-[#bbb] inline-block"></span>
+                <span className="text-sm text-[#5a4b7a] font-semibold">White</span>
+                <span className="text-base ml-1 text-[#4a3b6b]">{capturedPieces.white.join(' ') || '—'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* XP / Stats */}
+          <div className="play-card play-card-xp">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-lg">✨</span>
+              <span className="text-base font-bold text-[#6c5ce7]">{xp} XP</span>
+            </div>
+            <div className="play-progress-bar">
+              <div className="play-progress-fill" style={{ width: `${(xp % 200) / 2}%` }} />
+            </div>
+            <p className="text-xs text-[#7a6b9a] mt-1.5 font-medium">Level {stats.level} • {200 - (xp % 200)} XP to next level</p>
+          </div>
         </aside>
 
-        {/* Center - Board area */}
+        {/* Main Board Area - clean, maximized */}
         <main className="flex-1 flex flex-col items-center justify-center min-w-0 min-h-0">
-          {/* VS Player Header */}
-          <div className="play-vs-header mb-3 w-full">
-            <div className="flex items-center gap-3">
-              <div className="play-avatar play-avatar-you">🐉</div>
-              <div className="text-left">
-                <span className="font-bold text-[#4a3b6b] text-lg">You</span>
-                <span className="text-base text-[#7a6b9a] ml-1.5">({playerColor === 'white' ? 'White' : 'Black'})</span>
-              </div>
-            </div>
-
-            <div className="play-vs-badge">VS</div>
-
-            <div className="flex items-center gap-3">
-              <div className="text-right ml-auto">
-                <span className="font-bold text-[#4a3b6b] text-lg">Computer</span>
-                <span className="text-base text-[#7a6b9a] ml-1.5">({playerColor === 'white' ? 'Black' : 'White'})</span>
-              </div>
-              <div className="play-avatar play-avatar-ai">🖥️</div>
-            </div>
+          {/* Compact VS Header */}
+          <div className="flex items-center justify-center gap-3 mb-2 px-4 py-1.5 rounded-full bg-white/70 backdrop-blur-sm shadow-sm border border-[#e8dff5]/60 max-w-max">
+            <span className="font-bold text-sm text-[#4a3b6b]">You</span>
+            <span className="text-xs text-[#7a6b9a]">({playerColor === 'white' ? 'White' : 'Black'})</span>
+            <span className="text-xs font-bold text-[#9b7fd4] bg-[#f5f0ff] px-2 py-0.5 rounded-full">VS</span>
+            <span className="font-bold text-sm text-[#4a3b6b]">Computer</span>
+            <span className="text-xs text-[#7a6b9a]">({playerColor === 'white' ? 'Black' : 'White'})</span>
           </div>
 
           {/* Chess Board */}
@@ -468,72 +511,6 @@ export default function PlayPage() {
             </div>
           )}
         </main>
-
-        {/* Right Sidebar - hidden on mobile */}
-        <aside className="hidden lg:flex w-60 xl:w-68 2xl:w-76 shrink-0 lg:overflow-y-auto lg:max-h-full flex-col gap-3">
-          {/* Game Info */}
-          <div className="play-card">
-            <h3 className="play-card-title">GAME INFO</h3>
-            <div className="space-y-3">
-              <InfoRow label="Game Type" value={gameMode === 'computer' ? 'vs Computer' : gameMode === 'friend' ? 'vs Friend' : 'Online'} />
-              <InfoRow label="Difficulty" value={currentDifficulty.label} />
-              <InfoRow label="Color" value={playerColor === 'white' ? 'White' : 'Black'} />
-              <InfoRow label="Move" value={isPlaying ? `${Math.ceil(moveHistory.length / 2) || 1}. ${playerColor === 'white' ? 'White' : 'Black'} to move` : '—'} />
-            </div>
-          </div>
-
-          {/* Move List */}
-          <div className="play-card min-h-0">
-            <h3 className="play-card-title">MOVE LIST</h3>
-            {moveHistory.length > 0 ? (
-              <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                {Array.from({ length: Math.ceil(moveHistory.length / 2) }, (_, i) => (
-                  <div key={i} className="flex text-base">
-                    <span className="text-[#9b8fb5] w-7 font-semibold">{i + 1}.</span>
-                    <span className="text-[#4a3b6b] flex-1 font-semibold">{moveHistory[i * 2]}</span>
-                    {moveHistory[i * 2 + 1] && (
-                      <span className="text-[#6b5b8a] flex-1">{moveHistory[i * 2 + 1]}</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-4 text-[#9b8fb5]">
-                <span className="text-3xl mb-1 opacity-50">📜</span>
-                <p className="text-sm">Moves will appear here</p>
-              </div>
-            )}
-          </div>
-
-          {/* Captured Pieces */}
-          <div className="play-card">
-            <h3 className="play-card-title">CAPTURED PIECES</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-[#3a3a3a] border-2 border-[#555] inline-block"></span>
-                <span className="text-base text-[#5a4b7a] font-semibold">Black</span>
-                <span className="text-lg ml-2 text-[#4a3b6b]">{capturedPieces.black.join(' ') || '—'}</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-white border-2 border-[#bbb] inline-block"></span>
-                <span className="text-base text-[#5a4b7a] font-semibold">White</span>
-                <span className="text-lg ml-2 text-[#4a3b6b]">{capturedPieces.white.join(' ') || '—'}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* XP / Stats */}
-          <div className="play-card play-card-xp">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">✨</span>
-              <span className="text-lg font-bold text-[#6c5ce7]">{xp} XP</span>
-            </div>
-            <div className="play-progress-bar">
-              <div className="play-progress-fill" style={{ width: `${(xp % 200) / 2}%` }} />
-            </div>
-            <p className="text-sm text-[#7a6b9a] mt-2 font-medium">Level {stats.level} • {200 - (xp % 200)} XP to next level</p>
-          </div>
-        </aside>
       </div>
     </div>
   );
@@ -603,11 +580,3 @@ function ActionButton({ icon, label, onClick }: { icon: string; label: string; o
   );
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between items-center">
-      <span className="text-[#7a6b9a] text-base">{label}</span>
-      <span className="text-[#4a3b6b] font-bold text-base">{value}</span>
-    </div>
-  );
-}

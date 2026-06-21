@@ -3,7 +3,7 @@ import "./globals.css";
 import Navigation from "@/components/Navigation";
 
 export const metadata: Metadata = {
-  title: "Chess Quest - A Magical Chess Adventure",
+  title: "Chess for Kids - Learn & Play",
   description: "Learn and play chess in a magical fantasy world! Perfect for kids and adults alike.",
   icons: {
     icon: "/favicon.png",

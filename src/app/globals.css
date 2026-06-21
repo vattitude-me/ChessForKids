@@ -325,11 +325,11 @@ body {
 
 /* Play page - Light fantasy theme */
 .play-page-light {
-  background: #f8f4ff;
+  background: transparent;
 }
 
 .play-bg-gradient {
-  background: linear-gradient(180deg, rgba(237, 228, 248, 0.92) 0%, rgba(248, 244, 255, 0.96) 40%, rgba(250, 248, 255, 0.98) 100%);
+  background: linear-gradient(180deg, rgba(237, 228, 248, 0.3) 0%, rgba(248, 244, 255, 0.35) 50%, rgba(250, 248, 255, 0.4) 100%);
 }
 
 

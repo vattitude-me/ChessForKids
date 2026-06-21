@@ -66,48 +66,58 @@ export default function Navigation() {
 
   return (
     <>
-      {/* Desktop/Tablet floating pill nav */}
-      <nav className="fixed top-5 left-1/2 -translate-x-1/2 z-50 hidden md:block">
-        <div className="nav-pill flex items-center px-3 lg:px-4 py-2 lg:py-2.5 rounded-full">
-          {/* Logo */}
-          <Link href="/" className="nav-pill-logo flex items-center gap-2 shrink-0 mr-3 lg:mr-4 pl-1">
+      {/* Desktop/Tablet: Logo on left + centered nav pill */}
+      <div className="fixed top-0 left-0 right-0 z-50 hidden md:flex items-center px-5 lg:px-8 py-3">
+        {/* Logo - bold, prominent, with dark backing for contrast */}
+        <Link href="/" className="flex items-center gap-3 shrink-0 group">
+          <div className="relative">
+            <div className="absolute inset-0 rounded-2xl bg-[#1a1035]/80 blur-sm scale-110" />
             <Image
               src="/logo.png"
               alt="Chess for Kids"
-              width={40}
-              height={40}
-              className="nav-pill-logo-img object-contain"
+              width={56}
+              height={56}
+              className="relative object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform"
             />
-            <span className="hidden lg:block font-bold text-base leading-tight nav-pill-logo-text">
-              <span style={{ color: '#ffd700' }}>Chess</span>
-              <span className="text-[10px] block" style={{ color: '#c0b0ff' }}>for Kids</span>
-            </span>
-          </Link>
-
-          {/* Nav items */}
-          <div className="flex items-center gap-1">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`nav-pill-item flex items-center gap-2 rounded-full transition-all duration-300 ${
-                    isActive ? 'nav-pill-item-active' : ''
-                  }`}
-                >
-                  <NavIcon type={item.icon} active={isActive} />
-                  <span className={`font-bold text-sm lg:text-base whitespace-nowrap ${
-                    isActive ? 'text-white nav-pill-item-label' : 'text-[#d0d0dc]'
-                  }`}>
-                    {item.label}
-                  </span>
-                </Link>
-              );
-            })}
           </div>
-        </div>
-      </nav>
+          <div className="leading-tight">
+            <span className="font-black text-2xl lg:text-3xl block tracking-tight" style={{ color: '#ffffff', textShadow: '0 2px 12px rgba(108, 92, 231, 0.6), 0 4px 20px rgba(0,0,0,0.4)' }}>
+              Chess for <span style={{ color: '#ffd700' }}>Kids</span>
+            </span>
+            <span className="text-[11px] lg:text-xs font-bold block tracking-widest uppercase" style={{ color: '#c4b5e0', textShadow: '0 1px 6px rgba(0,0,0,0.4)' }}>Learn & Play</span>
+          </div>
+        </Link>
+
+        {/* Centered nav pill */}
+        <nav className="flex-1 flex justify-center">
+          <div className="nav-pill flex items-center px-3 lg:px-4 py-2 lg:py-2.5 rounded-full">
+            <div className="flex items-center gap-1">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`nav-pill-item flex items-center gap-2 rounded-full transition-all duration-300 ${
+                      isActive ? 'nav-pill-item-active' : ''
+                    }`}
+                  >
+                    <NavIcon type={item.icon} active={isActive} />
+                    <span className={`font-bold text-sm lg:text-base whitespace-nowrap ${
+                      isActive ? 'text-white nav-pill-item-label' : 'text-[#d0d0dc]'
+                    }`}>
+                      {item.label}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </nav>
+
+        {/* Spacer to balance the logo width */}
+        <div className="w-[160px] shrink-0" />
+      </div>
 
       {/* Mobile bottom nav */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t" style={{ background: '#0d0a1af7', borderColor: '#ffffff15' }}>
