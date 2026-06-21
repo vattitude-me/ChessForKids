@@ -90,7 +90,7 @@ export default function PuzzlesPage() {
         <p className="text-xs text-yellow-300">{turn} to move</p>
       </div>
 
-      <div className="chess-board-container w-full max-w-[min(90vw,420px)] aspect-square magic-glow rounded-xl overflow-hidden">
+      <div className="chess-board-container w-full max-w-[min(90vw,480px)] lg:max-w-[min(85vw,640px)] xl:max-w-[min(80vw,720px)] aspect-square magic-glow rounded-xl overflow-hidden">
         <Chessboard
           options={{
             position: game.fen(),

@@ -157,7 +157,7 @@ function LessonStepView({ step }: { step: TutorialStep }) {
       </p>
 
       {step.fen && (
-        <div className="chess-board-container w-full max-w-[min(80vw,380px)] mx-auto aspect-square magic-glow rounded-xl overflow-hidden">
+        <div className="chess-board-container w-full max-w-[min(80vw,380px)] lg:max-w-[min(75vw,560px)] xl:max-w-[min(70vw,640px)] mx-auto aspect-square magic-glow rounded-xl overflow-hidden">
           <Chessboard
             options={{
               position: step.fen,

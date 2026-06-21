@@ -150,7 +150,7 @@ export default function ChessBoard({ difficulty, onGameEnd, playerColor = 'white
         )}
       </div>
 
-      <div className="chess-board-container w-full max-w-[min(90vw,480px)] aspect-square magic-glow rounded-xl overflow-hidden">
+      <div className="chess-board-container w-full max-w-[min(90vw,480px)] lg:max-w-[min(85vw,640px)] xl:max-w-[min(80vw,720px)] aspect-square magic-glow rounded-xl overflow-hidden">
         <Chessboard
           options={{
             position: game.fen(),
