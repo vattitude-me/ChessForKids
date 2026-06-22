@@ -5,6 +5,7 @@ import { Chess, Square, Move } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
 import { getBestMove, DifficultyLevel } from '@/lib/chess-ai';
 import { customPieces } from './ChessPieces';
+import { fantasyPieces } from './ChessPiecesFantasy';
 import confetti from 'canvas-confetti';
 
 interface ChessBoardProps {
@@ -13,10 +14,17 @@ interface ChessBoardProps {
   onMove?: (move: { san: string; color: 'w' | 'b'; captured?: string }) => void;
   playerColor?: 'white' | 'black';
   boardTheme?: { dark: string; light: string; label: string };
+  pieceTheme?: 'classic' | 'fantasy';
   minimal?: boolean;
 }
 
-export default function ChessBoard({ difficulty, onGameEnd, onMove, playerColor = 'white', boardTheme, minimal = false }: ChessBoardProps) {
+const pieceThemes = {
+  classic: customPieces,
+  fantasy: fantasyPieces,
+};
+
+export default function ChessBoard({ difficulty, onGameEnd, onMove, playerColor = 'white', boardTheme, pieceTheme = 'classic', minimal = false }: ChessBoardProps) {
+  const activePieces = pieceThemes[pieceTheme];
   const [game, setGame] = useState(new Chess());
   const [gameOver, setGameOver] = useState(false);
   const [gameResult, setGameResult] = useState<string>('');
@@ -271,7 +279,7 @@ export default function ChessBoard({ difficulty, onGameEnd, onMove, playerColor 
               onPieceClick: handlePieceClick,
               canDragPiece: canDragPiece,
               boardOrientation: playerColor,
-              pieces: customPieces,
+              pieces: activePieces,
               boardStyle: { borderRadius: '12px' },
               darkSquareStyle: { backgroundColor: boardTheme?.dark ?? '#6c5ce7' },
               lightSquareStyle: { backgroundColor: boardTheme?.light ?? '#ddd6fe' },
@@ -320,7 +328,7 @@ export default function ChessBoard({ difficulty, onGameEnd, onMove, playerColor 
             onPieceClick: handlePieceClick,
             canDragPiece: canDragPiece,
             boardOrientation: playerColor,
-            pieces: customPieces,
+            pieces: activePieces,
             boardStyle: { borderRadius: '12px' },
             darkSquareStyle: { backgroundColor: boardTheme?.dark ?? '#6c5ce7' },
             lightSquareStyle: { backgroundColor: boardTheme?.light ?? '#ddd6fe' },

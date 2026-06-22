@@ -24,13 +24,15 @@ export default function PlayPage() {
     recordWin,
     recordLoss,
     recordDraw,
+    saveGameRecord,
   } = useGameStore();
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [playerColor, setPlayerColor] = useState<'white' | 'black'>('white');
   const [boardTheme, setBoardTheme] = useState<BoardTheme>('wood');
+  const [pieceStyle, setPieceStyle] = useState<'classic' | 'fantasy'>('classic');
   const [gameMode, setGameMode] = useState<'computer' | 'friend' | 'online'>('computer');
-  const [openSection, setOpenSection] = useState<'game' | 'difficulty' | 'settings' | null>(null);
+  const [openSection, setOpenSection] = useState<'game' | 'difficulty' | 'settings' | null>('settings');
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
   const [capturedPieces, setCapturedPieces] = useState<{ white: string[]; black: string[] }>({ white: [], black: [] });
   const [gameResult, setGameResult] = useState<string | null>(null);
@@ -58,6 +60,14 @@ export default function PlayPage() {
         setGameResult('Draw!');
         break;
     }
+    saveGameRecord({
+      result,
+      difficulty: currentDifficulty.label,
+      playerColor,
+      moves: moveHistory,
+      capturedPieces,
+      totalMoves: moveHistory.length,
+    });
   }
 
   function startNewGame() {
@@ -166,6 +176,17 @@ export default function PlayPage() {
                     ))}
                   </div>
                 </div>
+                <div>
+                  <label className="text-sm text-[#5a4b7a] mb-1.5 block font-semibold">Pieces</label>
+                  <div className="flex gap-2">
+                    <button onClick={() => setPieceStyle('classic')} className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold border-2 flex items-center justify-center gap-1.5 ${pieceStyle === 'classic' ? 'bg-white text-[#4a3b6b] border-[#9b7fd4] shadow-md' : 'bg-[#f8f4ff] text-[#7a6b9a] border-[#e8dff5]'}`}>
+                      <span className="text-base">♞</span> Classic
+                    </button>
+                    <button onClick={() => setPieceStyle('fantasy')} className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold border-2 flex items-center justify-center gap-1.5 ${pieceStyle === 'fantasy' ? 'bg-white text-[#4a3b6b] border-[#9b7fd4] shadow-md' : 'bg-[#f8f4ff] text-[#7a6b9a] border-[#e8dff5]'}`}>
+                      <span className="text-base">🏰</span> Fantasy
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Move List */}
@@ -229,171 +250,227 @@ export default function PlayPage() {
 
         {/* Left Sidebar - all controls and info panels */}
         <aside className="hidden lg:flex w-72 xl:w-80 2xl:w-88 shrink-0 lg:overflow-y-auto lg:max-h-full flex-col gap-2.5">
-          {/* Game Mode - Accordion */}
-          <div className="play-card overflow-hidden">
-            {openSection === 'game' ? (
-              <>
-                <button
-                  className="w-full flex items-center justify-between px-4 py-3 bg-[#9b7fd4] rounded-xl mb-3 cursor-pointer"
-                  onClick={() => setOpenSection(null)}
-                >
-                  <span className="text-white font-bold text-sm tracking-wide">GAME</span>
-                  <svg className="w-4 h-4 text-white rotate-180" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
-                </button>
-                <div className="flex flex-col gap-2">
-                  <GameModeButton
-                    icon="🖥️"
-                    label="Play vs Computer"
-                    active={gameMode === 'computer'}
-                    onClick={() => { setGameMode('computer'); setOpenSection(null); }}
-                  />
-                  <GameModeButton
-                    icon="👤"
-                    label="Play vs Friend"
-                    active={gameMode === 'friend'}
-                    onClick={() => setGameMode('friend')}
-                    disabled
-                  />
-                  <GameModeButton
-                    icon="🌐"
-                    label="Online Players"
-                    active={gameMode === 'online'}
-                    onClick={() => setGameMode('online')}
-                    disabled
-                  />
-                </div>
-              </>
-            ) : (
+          {/* Game Setup Section - collapsed during active game */}
+          {isPlaying && !gameResult ? (
+            <div className="play-card overflow-hidden">
               <button
                 className="w-full flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#f5f0ff] rounded-xl transition-colors"
-                onClick={() => setOpenSection('game')}
+                onClick={() => setIsPlaying(false)}
               >
-                <span className="text-xl">{gameMode === 'computer' ? '🖥️' : gameMode === 'friend' ? '👤' : '🌐'}</span>
+                <span className="text-xl">⚙️</span>
                 <div className="flex-1 text-left">
-                  <span className="text-xs font-bold text-[#9b7fd4] tracking-wider block">GAME</span>
-                  <span className="font-bold text-base text-[#4a3b6b]">
-                    {gameMode === 'computer' ? 'Play vs Computer' : gameMode === 'friend' ? 'Play vs Friend' : 'Online Players'}
+                  <span className="text-xs font-bold text-[#9b7fd4] tracking-wider block">GAME SETUP</span>
+                  <span className="font-bold text-sm text-[#4a3b6b]">
+                    {gameMode === 'computer' ? 'vs Computer' : gameMode === 'friend' ? 'vs Friend' : 'Online'} • {currentDifficulty.label} • {playerColor === 'white' ? 'White' : 'Black'}
                   </span>
                 </div>
                 <svg className="w-4 h-4 text-[#9b7fd4]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
               </button>
-            )}
-          </div>
-
-          {/* Difficulty - Accordion */}
-          <div className="play-card overflow-hidden">
-            {openSection === 'difficulty' ? (
-              <>
-                <button
-                  className="w-full flex items-center justify-between px-4 py-3 bg-[#9b7fd4] rounded-xl mb-3 cursor-pointer"
-                  onClick={() => setOpenSection(null)}
-                >
-                  <span className="text-white font-bold text-sm tracking-wide">DIFFICULTY</span>
-                  <svg className="w-4 h-4 text-white rotate-180" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
-                </button>
-                <div className="flex flex-col gap-2">
-                  {difficultyLevels.slice(0, 4).map((level, index) => {
-                    const isUnlocked = index <= stats.highestDifficultyBeaten + 1;
-                    return (
-                      <DifficultyOption
-                        key={level.name}
-                        level={level}
-                        selected={index === currentDifficultyIndex}
-                        unlocked={isUnlocked}
-                        onClick={() => { if (isUnlocked) { setDifficulty(index); setOpenSection(null); } }}
+            </div>
+          ) : (
+            <>
+              {/* Game Mode - Accordion */}
+              <div className="play-card overflow-hidden">
+                {openSection === 'game' ? (
+                  <>
+                    <button
+                      className="w-full flex items-center justify-between px-4 py-3 bg-[#9b7fd4] rounded-xl mb-3 cursor-pointer"
+                      onClick={() => setOpenSection(null)}
+                    >
+                      <span className="text-white font-bold text-sm tracking-wide">GAME</span>
+                      <svg className="w-4 h-4 text-white rotate-180" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                    </button>
+                    <div className="flex flex-col gap-2">
+                      <GameModeButton
+                        icon="🖥️"
+                        label="Play vs Computer"
+                        active={gameMode === 'computer'}
+                        onClick={() => { setGameMode('computer'); setOpenSection(null); }}
                       />
-                    );
-                  })}
-                </div>
-              </>
-            ) : (
-              <button
-                className="w-full flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#f5f0ff] rounded-xl transition-colors"
-                onClick={() => setOpenSection('difficulty')}
-              >
-                <span className="w-7 h-7 rounded-full bg-[#9b7fd4] flex items-center justify-center shrink-0">
-                  <span className="text-white text-xs font-bold">{currentDifficultyIndex + 1}</span>
-                </span>
-                <div className="flex-1 text-left">
-                  <span className="text-xs font-bold text-[#9b7fd4] tracking-wider block">DIFFICULTY</span>
-                  <span className="font-bold text-base text-[#4a3b6b]">{currentDifficulty.label}</span>
-                </div>
-                <svg className="w-4 h-4 text-[#9b7fd4]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
-              </button>
-            )}
-          </div>
+                      <GameModeButton
+                        icon="👤"
+                        label="Play vs Friend"
+                        active={gameMode === 'friend'}
+                        onClick={() => setGameMode('friend')}
+                        disabled
+                      />
+                      <GameModeButton
+                        icon="🌐"
+                        label="Online Players"
+                        active={gameMode === 'online'}
+                        onClick={() => setGameMode('online')}
+                        disabled
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#f5f0ff] rounded-xl transition-colors"
+                    onClick={() => setOpenSection('game')}
+                  >
+                    <span className="text-xl">{gameMode === 'computer' ? '🖥️' : gameMode === 'friend' ? '👤' : '🌐'}</span>
+                    <div className="flex-1 text-left">
+                      <span className="text-xs font-bold text-[#9b7fd4] tracking-wider block">GAME</span>
+                      <span className="font-bold text-base text-[#4a3b6b]">
+                        {gameMode === 'computer' ? 'Play vs Computer' : gameMode === 'friend' ? 'Play vs Friend' : 'Online Players'}
+                      </span>
+                    </div>
+                    <svg className="w-4 h-4 text-[#9b7fd4]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                  </button>
+                )}
+              </div>
 
-          {/* Game Settings - Accordion */}
-          <div className="play-card overflow-hidden">
-            {openSection === 'settings' ? (
-              <>
-                <button
-                  className="w-full flex items-center justify-between px-4 py-3 bg-[#9b7fd4] rounded-xl mb-3 cursor-pointer"
-                  onClick={() => setOpenSection(null)}
-                >
-                  <span className="text-white font-bold text-sm tracking-wide">SETTINGS</span>
-                  <svg className="w-4 h-4 text-white rotate-180" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
-                </button>
-                <div>
-                  <div className="mb-4">
-                    <label className="text-sm text-[#5a4b7a] mb-2 block font-semibold">Play As</label>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setPlayerColor('white')}
-                        className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold transition-all border-2 ${
-                          playerColor === 'white'
-                            ? 'bg-white text-[#4a3b6b] border-[#9b7fd4] shadow-md'
-                            : 'bg-[#f8f4ff] text-[#7a6b9a] border-[#e8dff5] hover:border-[#c4b5e0]'
-                        }`}
-                      >
-                        White
-                      </button>
-                      <button
-                        onClick={() => setPlayerColor('black')}
-                        className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold transition-all border-2 ${
-                          playerColor === 'black'
-                            ? 'bg-[#3a2d5c] text-white border-[#9b7fd4] shadow-md'
-                            : 'bg-[#f8f4ff] text-[#7a6b9a] border-[#e8dff5] hover:border-[#c4b5e0]'
-                        }`}
-                      >
-                        Black
-                      </button>
+              {/* Difficulty - Accordion */}
+              <div className="play-card overflow-hidden">
+                {openSection === 'difficulty' ? (
+                  <>
+                    <button
+                      className="w-full flex items-center justify-between px-4 py-3 bg-[#9b7fd4] rounded-xl mb-3 cursor-pointer"
+                      onClick={() => setOpenSection(null)}
+                    >
+                      <span className="text-white font-bold text-sm tracking-wide">DIFFICULTY</span>
+                      <svg className="w-4 h-4 text-white rotate-180" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                    </button>
+                    <div className="flex flex-col gap-2">
+                      {difficultyLevels.slice(0, 4).map((level, index) => {
+                        const isUnlocked = index <= stats.highestDifficultyBeaten + 1;
+                        return (
+                          <DifficultyOption
+                            key={level.name}
+                            level={level}
+                            selected={index === currentDifficultyIndex}
+                            unlocked={isUnlocked}
+                            onClick={() => { if (isUnlocked) { setDifficulty(index); setOpenSection(null); } }}
+                          />
+                        );
+                      })}
                     </div>
-                  </div>
-                  <div className="mb-3">
-                    <label className="text-sm text-[#5a4b7a] mb-2 block font-semibold">Board Theme</label>
-                    <div className="flex gap-3">
-                      {(Object.keys(boardThemes) as BoardTheme[]).map((theme) => (
-                        <button
-                          key={theme}
-                          onClick={() => setBoardTheme(theme)}
-                          className={`w-9 h-9 rounded-xl overflow-hidden border-2 transition-all ${
-                            boardTheme === theme ? 'border-[#9b7fd4] scale-110 shadow-lg' : 'border-[#e8dff5] hover:border-[#c4b5e0]'
-                          }`}
-                          title={boardThemes[theme].label}
-                        >
-                          <div className="w-full h-1/2" style={{ backgroundColor: boardThemes[theme].light }} />
-                          <div className="w-full h-1/2" style={{ backgroundColor: boardThemes[theme].dark }} />
-                        </button>
-                      ))}
+                  </>
+                ) : (
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#f5f0ff] rounded-xl transition-colors"
+                    onClick={() => setOpenSection('difficulty')}
+                  >
+                    <span className="w-7 h-7 rounded-full bg-[#9b7fd4] flex items-center justify-center shrink-0">
+                      <span className="text-white text-xs font-bold">{currentDifficultyIndex + 1}</span>
+                    </span>
+                    <div className="flex-1 text-left">
+                      <span className="text-xs font-bold text-[#9b7fd4] tracking-wider block">DIFFICULTY</span>
+                      <span className="font-bold text-base text-[#4a3b6b]">{currentDifficulty.label}</span>
                     </div>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <button
-                className="w-full flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#f5f0ff] rounded-xl transition-colors"
-                onClick={() => setOpenSection('settings')}
-              >
-                <span className="text-xl">⚙️</span>
-                <div className="flex-1 text-left">
-                  <span className="text-xs font-bold text-[#9b7fd4] tracking-wider block">SETTINGS</span>
-                  <span className="font-bold text-base text-[#4a3b6b]">{playerColor === 'white' ? 'White' : 'Black'} • {boardThemes[boardTheme].label}</span>
-                </div>
-                <svg className="w-4 h-4 text-[#9b7fd4]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
-              </button>
-            )}
-          </div>
+                    <svg className="w-4 h-4 text-[#9b7fd4]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                  </button>
+                )}
+              </div>
+
+              {/* Game Settings - Accordion */}
+              <div className="play-card overflow-hidden">
+                {openSection === 'settings' ? (
+                  <>
+                    <button
+                      className="w-full flex items-center justify-between px-4 py-3 bg-[#9b7fd4] rounded-xl mb-3 cursor-pointer"
+                      onClick={() => setOpenSection(null)}
+                    >
+                      <span className="text-white font-bold text-sm tracking-wide">SETTINGS</span>
+                      <svg className="w-4 h-4 text-white rotate-180" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                    </button>
+                    <div>
+                      <div className="mb-4">
+                        <label className="text-sm text-[#5a4b7a] mb-2 block font-semibold">Play As</label>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setPlayerColor('white')}
+                            className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold transition-all border-2 ${
+                              playerColor === 'white'
+                                ? 'bg-white text-[#4a3b6b] border-[#9b7fd4] shadow-md'
+                                : 'bg-[#f8f4ff] text-[#7a6b9a] border-[#e8dff5] hover:border-[#c4b5e0]'
+                            }`}
+                          >
+                            White
+                          </button>
+                          <button
+                            onClick={() => setPlayerColor('black')}
+                            className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold transition-all border-2 ${
+                              playerColor === 'black'
+                                ? 'bg-[#3a2d5c] text-white border-[#9b7fd4] shadow-md'
+                                : 'bg-[#f8f4ff] text-[#7a6b9a] border-[#e8dff5] hover:border-[#c4b5e0]'
+                            }`}
+                          >
+                            Black
+                          </button>
+                        </div>
+                      </div>
+                      <div className="mb-4">
+                        <label className="text-sm text-[#5a4b7a] mb-2 block font-semibold">Board Theme</label>
+                        <div className="flex gap-3">
+                          {(Object.keys(boardThemes) as BoardTheme[]).map((theme) => {
+                            const light = boardThemes[theme].light;
+                            const dark = boardThemes[theme].dark;
+                            return (
+                              <button
+                                key={theme}
+                                onClick={() => setBoardTheme(theme)}
+                                className={`w-10 h-10 rounded-lg border-2 transition-all ${
+                                  boardTheme === theme ? 'border-[#9b7fd4] scale-110 shadow-lg' : 'border-[#e8dff5] hover:border-[#c4b5e0]'
+                                }`}
+                                title={boardThemes[theme].label}
+                                style={{
+                                  background: `
+                                    linear-gradient(45deg, ${dark} 25%, transparent 25%, transparent 75%, ${dark} 75%),
+                                    linear-gradient(45deg, ${dark} 25%, transparent 25%, transparent 75%, ${dark} 75%)
+                                  `,
+                                  backgroundColor: light,
+                                  backgroundSize: '50% 50%',
+                                  backgroundPosition: '0 0, 25% 25%',
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
+                      </div>
+                      <div className="mb-3">
+                        <label className="text-sm text-[#5a4b7a] mb-2 block font-semibold">Pieces</label>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setPieceStyle('classic')}
+                            className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold transition-all border-2 flex items-center justify-center gap-1.5 ${
+                              pieceStyle === 'classic'
+                                ? 'bg-white text-[#4a3b6b] border-[#9b7fd4] shadow-md'
+                                : 'bg-[#f8f4ff] text-[#7a6b9a] border-[#e8dff5] hover:border-[#c4b5e0]'
+                            }`}
+                          >
+                            <span className="text-base">♞</span> Classic
+                          </button>
+                          <button
+                            onClick={() => setPieceStyle('fantasy')}
+                            className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold transition-all border-2 flex items-center justify-center gap-1.5 ${
+                              pieceStyle === 'fantasy'
+                                ? 'bg-white text-[#4a3b6b] border-[#9b7fd4] shadow-md'
+                                : 'bg-[#f8f4ff] text-[#7a6b9a] border-[#e8dff5] hover:border-[#c4b5e0]'
+                            }`}
+                          >
+                            <span className="text-base">🏰</span> Fantasy
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#f5f0ff] rounded-xl transition-colors"
+                    onClick={() => setOpenSection('settings')}
+                  >
+                    <span className="text-xl">⚙️</span>
+                    <div className="flex-1 text-left">
+                      <span className="text-xs font-bold text-[#9b7fd4] tracking-wider block">SETTINGS</span>
+                      <span className="font-bold text-base text-[#4a3b6b]">{playerColor === 'white' ? 'White' : 'Black'} • {boardThemes[boardTheme].label}</span>
+                    </div>
+                    <svg className="w-4 h-4 text-[#9b7fd4]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                  </button>
+                )}
+              </div>
+            </>
+          )}
 
           {/* New Game Button */}
           <button onClick={startNewGame} className="play-start-btn w-full">
@@ -403,44 +480,59 @@ export default function PlayPage() {
           {/* Divider */}
           <div className="border-t border-[#e8dff5]/50 my-1" />
 
-          {/* Move List */}
-          <div className="play-card min-h-0">
-            <h3 className="play-card-title text-xs">MOVE LIST</h3>
-            {moveHistory.length > 0 ? (
-              <div className="space-y-1 max-h-32 overflow-y-auto pr-1">
-                {Array.from({ length: Math.ceil(moveHistory.length / 2) }, (_, i) => (
-                  <div key={i} className="flex text-sm">
-                    <span className="text-[#9b8fb5] w-6 font-semibold">{i + 1}.</span>
-                    <span className="text-[#4a3b6b] flex-1 font-semibold">{moveHistory[i * 2]}</span>
-                    {moveHistory[i * 2 + 1] && (
-                      <span className="text-[#6b5b8a] flex-1">{moveHistory[i * 2 + 1]}</span>
-                    )}
+          {/* Move List & Captured Pieces - expanded during and after game, collapsed before first game */}
+          {isPlaying || gameResult ? (
+            <>
+              {/* Move List */}
+              <div className="play-card min-h-0">
+                <h3 className="play-card-title text-xs">MOVE LIST</h3>
+                {moveHistory.length > 0 ? (
+                  <div className="space-y-1 max-h-32 overflow-y-auto pr-1">
+                    {Array.from({ length: Math.ceil(moveHistory.length / 2) }, (_, i) => (
+                      <div key={i} className="flex text-sm">
+                        <span className="text-[#9b8fb5] w-6 font-semibold">{i + 1}.</span>
+                        <span className="text-[#4a3b6b] flex-1 font-semibold">{moveHistory[i * 2]}</span>
+                        {moveHistory[i * 2 + 1] && (
+                          <span className="text-[#6b5b8a] flex-1">{moveHistory[i * 2 + 1]}</span>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <div className="flex items-center justify-center py-2 text-[#9b8fb5]">
+                    <p className="text-xs">Moves will appear here</p>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="flex items-center justify-center py-2 text-[#9b8fb5]">
-                <p className="text-xs">Moves will appear here</p>
-              </div>
-            )}
-          </div>
 
-          {/* Captured Pieces */}
-          <div className="play-card">
-            <h3 className="play-card-title text-xs">CAPTURED PIECES</h3>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-full bg-[#3a3a3a] border-2 border-[#555] inline-block"></span>
-                <span className="text-sm text-[#5a4b7a] font-semibold">Black</span>
-                <span className="text-base ml-1 text-[#4a3b6b]">{capturedPieces.black.join(' ') || '—'}</span>
+              {/* Captured Pieces */}
+              <div className="play-card">
+                <h3 className="play-card-title text-xs">CAPTURED PIECES</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full bg-[#3a3a3a] border-2 border-[#555] inline-block"></span>
+                    <span className="text-sm text-[#5a4b7a] font-semibold">Black</span>
+                    <span className="text-base ml-1 text-[#4a3b6b]">{capturedPieces.black.join(' ') || '—'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full bg-white border-2 border-[#bbb] inline-block"></span>
+                    <span className="text-sm text-[#5a4b7a] font-semibold">White</span>
+                    <span className="text-base ml-1 text-[#4a3b6b]">{capturedPieces.white.join(' ') || '—'}</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-full bg-white border-2 border-[#bbb] inline-block"></span>
-                <span className="text-sm text-[#5a4b7a] font-semibold">White</span>
-                <span className="text-base ml-1 text-[#4a3b6b]">{capturedPieces.white.join(' ') || '—'}</span>
+            </>
+          ) : (
+            <div className="play-card overflow-hidden">
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl">
+                <span className="text-xl">📋</span>
+                <div className="flex-1 text-left">
+                  <span className="text-xs font-bold text-[#9b7fd4] tracking-wider block">GAME INFO</span>
+                  <span className="text-sm text-[#7a6b9a]">Moves & captures appear during play</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* XP / Stats */}
           <div className="play-card play-card-xp">
@@ -477,6 +569,7 @@ export default function PlayPage() {
                   onMove={handleMove}
                   playerColor={playerColor}
                   boardTheme={boardThemes[boardTheme]}
+                  pieceTheme={pieceStyle}
                   minimal
                 />
               </div>

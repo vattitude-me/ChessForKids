@@ -26,6 +26,17 @@ export interface PlayerStats {
   highestDifficultyBeaten: number;
 }
 
+export interface GameRecord {
+  id: string;
+  date: string;
+  result: 'win' | 'loss' | 'draw';
+  difficulty: string;
+  playerColor: 'white' | 'black';
+  moves: string[];
+  capturedPieces: { white: string[]; black: string[] };
+  totalMoves: number;
+}
+
 export interface GameState {
   playerName: string;
   playerAge: number | null;
@@ -33,6 +44,7 @@ export interface GameState {
   difficultyLevels: DifficultyLevel[];
   stats: PlayerStats;
   tutorialProgress: number[];
+  gameHistory: GameRecord[];
   setPlayerName: (name: string) => void;
   setPlayerAge: (age: number) => void;
   setDifficulty: (index: number) => void;
@@ -43,6 +55,7 @@ export interface GameState {
   recordLessonCompleted: (lessonId: number) => void;
   addBadge: (badge: Badge) => void;
   addXp: (amount: number) => void;
+  saveGameRecord: (record: Omit<GameRecord, 'id' | 'date'>) => void;
   resetStats: () => void;
 }
 
@@ -84,6 +97,7 @@ export const useGameStore = create<GameState>()(
       difficultyLevels: generateDifficultyLevels(),
       stats: { ...defaultStats },
       tutorialProgress: [],
+      gameHistory: [],
 
       setPlayerName: (name: string) => set({ playerName: name }),
       setPlayerAge: (age: number) => {
@@ -237,7 +251,17 @@ export const useGameStore = create<GameState>()(
         });
       },
 
-      resetStats: () => set({ stats: { ...defaultStats } }),
+      saveGameRecord: (record: Omit<GameRecord, 'id' | 'date'>) => {
+        const state = get();
+        const newRecord: GameRecord = {
+          ...record,
+          id: `game-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          date: new Date().toISOString(),
+        };
+        set({ gameHistory: [...state.gameHistory, newRecord] });
+      },
+
+      resetStats: () => set({ stats: { ...defaultStats }, gameHistory: [] }),
     }),
     {
       name: 'chess-for-kids-storage',
