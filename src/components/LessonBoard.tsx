@@ -237,7 +237,7 @@ export default function LessonBoard({
     : [];
 
   return (
-    <div className="lesson-board-wrapper relative">
+    <div className="lesson-board-wrapper relative w-full aspect-square">
       <div className="chess-board-container w-full aspect-square rounded-xl overflow-hidden shadow-lg border-3 border-[#8b5e34]">
         <Chessboard
           options={{

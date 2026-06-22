@@ -121,7 +121,7 @@ export default function PlayPage() {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setMobileMenuOpen(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white overflow-y-auto shadow-2xl">
+          <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white overflow-y-auto shadow-2xl pb-20">
             <div className="flex items-center justify-between px-4 py-4 border-b border-[#e8dff5]">
               <span className="font-bold text-lg text-[#4a3b6b]">Menu</span>
               <button onClick={() => setMobileMenuOpen(false)} className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#f5f0ff]">
@@ -589,14 +589,17 @@ export default function PlayPage() {
 
           {/* Action Buttons */}
           {isPlaying && !gameResult && (
-            <div className="flex gap-3 mt-3">
+            <div className="flex items-stretch gap-2.5 mt-3 mb-4 lg:mb-0">
               <ActionButton icon="🏳️" label="Resign" onClick={() => { setIsPlaying(false); handleGameEnd('loss'); }} />
               <ActionButton icon="🤝" label="Draw" onClick={() => { setIsPlaying(false); handleGameEnd('draw'); }} />
+              <button onClick={startNewGame} className="lg:hidden play-action-btn-primary">
+                <span>⚔️</span> <span>New Game</span>
+              </button>
             </div>
           )}
 
           {gameResult && (
-            <div className="mt-4 text-center">
+            <div className="mt-4 mb-4 lg:mb-0 text-center">
               <p className="text-3xl font-bold text-[#4a3b6b] celebrate mb-3">{gameResult}</p>
               <button onClick={startNewGame} className="play-start-btn inline-flex">
                 <span className="mr-2">⚔️</span> Play Again

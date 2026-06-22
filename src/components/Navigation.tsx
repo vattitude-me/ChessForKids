@@ -11,9 +11,9 @@ const navItems = [
 ];
 
 const mobileNavItems = [
-  { href: '/', label: 'Home', icon: '🏰' },
-  { href: '/learn', label: 'Lessons', icon: '📚' },
-  { href: '/play', label: 'Play', icon: '⚔️' },
+  { href: '/', label: 'Home', image: '/logo.png' },
+  { href: '/learn', label: 'Lessons', image: '/assets/learn_icon.png' },
+  { href: '/play', label: 'Play', image: '/assets/lessons_images/swords.png' },
 ];
 
 function NavIcon({ type, active }: { type: string; active: boolean }) {
@@ -116,22 +116,28 @@ export default function Navigation() {
       </div>
 
       {/* Mobile bottom nav */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t" style={{ background: '#0d0a1af7', borderColor: '#ffffff15' }}>
-        <div className="flex justify-around items-center py-2 px-2">
+      <nav className="mobile-bottom-nav fixed bottom-0 left-0 right-0 z-50 md:hidden">
+        <div className="flex justify-around items-center px-4 py-1.5">
           {mobileNavItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-colors"
-                style={{
-                  color: isActive ? '#ffd700' : '#a0a0b0',
-                  background: isActive ? '#7c3aed25' : 'transparent',
-                }}
+                className={`mobile-nav-item flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-2xl transition-all duration-200 ${isActive ? 'mobile-nav-item-active' : ''}`}
               >
-                <span className="text-lg">{item.icon}</span>
-                {item.label}
+                <div className={`mobile-nav-icon ${isActive ? 'mobile-nav-icon-active' : ''}`}>
+                  <Image
+                    src={item.image}
+                    alt={item.label}
+                    width={32}
+                    height={32}
+                    className="object-contain"
+                  />
+                </div>
+                <span className={`text-[10px] font-bold tracking-wide ${isActive ? 'text-[#ffd700]' : 'text-[#9a95b0]'}`}>
+                  {item.label}
+                </span>
               </Link>
             );
           })}

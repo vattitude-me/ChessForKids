@@ -269,8 +269,8 @@ export default function ChessBoard({ difficulty, onGameEnd, onMove, playerColor 
 
   if (minimal) {
     return (
-      <div className="w-full h-full">
-        <div className="chess-board-container w-full h-full magic-glow rounded-xl overflow-hidden">
+      <div className="w-full aspect-square">
+        <div className="chess-board-container w-full aspect-square magic-glow rounded-xl overflow-hidden">
           <Chessboard
             options={{
               position: game.fen(),

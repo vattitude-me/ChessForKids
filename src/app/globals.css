@@ -150,6 +150,39 @@ body {
   border: 1px solid rgba(108, 92, 231, 0.5);
 }
 
+/* Mobile bottom navigation — glassmorphism */
+.mobile-bottom-nav {
+  background: rgba(15, 10, 35, 0.55);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.mobile-nav-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  opacity: 0.55;
+  filter: grayscale(0.5) brightness(0.9);
+}
+
+.mobile-nav-icon-active {
+  opacity: 1;
+  filter: grayscale(0) brightness(1.1) drop-shadow(0 2px 10px rgba(155, 127, 212, 0.6));
+  transform: scale(1.15);
+}
+
+.mobile-nav-item-active {
+  background: rgba(155, 127, 212, 0.1);
+  border: 1px solid rgba(155, 127, 212, 0.15);
+}
+
 .progress-bar {
   height: 8px;
   border-radius: 4px;
@@ -226,6 +259,15 @@ body {
 @media (max-width: 768px) {
   .chess-board-container {
     max-width: 95vw;
+    height: auto !important;
+  }
+
+  .play-board-wrapper-light {
+    max-width: min(92vw, calc(100vh - 240px));
+  }
+
+  .lesson-board-wrapper {
+    max-width: min(92vw, calc(100vh - 280px));
   }
 }
 
@@ -456,6 +498,28 @@ body {
   box-shadow: 0 4px 12px rgba(108, 92, 231, 0.15);
 }
 
+.play-action-btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #9b7fd4, #7c5cbf);
+  border: 2px solid rgba(155, 127, 212, 0.6);
+  font-size: 0.875rem;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(124, 92, 191, 0.3);
+}
+
+.play-action-btn-primary:hover {
+  background: linear-gradient(135deg, #b196e0, #9b7fd4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(124, 92, 191, 0.4);
+}
+
 .play-progress-bar {
   height: 10px;
   border-radius: 5px;
@@ -472,9 +536,7 @@ body {
 
 .play-board-wrapper-light {
   width: 100%;
-  height: 100%;
   max-width: min(100%, calc(100vh - 300px));
-  max-height: min(100%, calc(100vh - 300px));
   aspect-ratio: 1;
   margin: 0 auto;
 }
@@ -495,9 +557,15 @@ body {
   filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.3));
 }
 
-/* Play page doesn't need mobile bottom padding since it's full-height */
+/* Play page uses minimal bottom padding — just enough to clear mobile nav */
 body:has(.play-page-container) > main {
   padding-bottom: 0 !important;
+}
+
+@media (max-width: 767px) {
+  body:has(.play-page-container) > main {
+    padding-bottom: 60px !important;
+  }
 }
 
 /* Large screens (1920px+) — gentle scale up */
@@ -1187,7 +1255,6 @@ body:has(.play-page-container) > main {
 
   .play-board-wrapper-light {
     max-width: min(48vw, calc(100vh - 14vw));
-    max-height: min(48vw, calc(100vh - 14vw));
   }
 
   .play-page-container > .relative.flex-1 {
