@@ -19,6 +19,7 @@ interface LessonBoardProps {
 function ensureKings(fen: string): string {
   const parts = fen.split(' ');
   const position = parts[0];
+  if (position === '8/8/8/8/8/8/8/8') return fen;
   const hasWhiteKing = position.includes('K');
   const hasBlackKing = position.includes('k');
   if (hasWhiteKing && hasBlackKing) return fen;
@@ -58,6 +59,11 @@ function ensureKings(fen: string): string {
   return parts.join(' ');
 }
 
+function isKinglessFen(fen: string): boolean {
+  const position = fen.split(' ')[0];
+  return !position.includes('K') || !position.includes('k');
+}
+
 export default function LessonBoard({
   fen,
   highlightSquares = [],
@@ -66,8 +72,9 @@ export default function LessonBoard({
   challenge,
   onChallengeComplete,
 }: LessonBoardProps) {
-  const safeFen = ensureKings(fen);
-  const [game, setGame] = useState(() => new Chess(safeFen));
+  const displayOnly = isKinglessFen(fen) && !interactive;
+  const safeFen = displayOnly ? fen : ensureKings(fen);
+  const [game, setGame] = useState(() => new Chess(displayOnly ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' : safeFen));
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
   const [legalMoves, setLegalMoves] = useState<Move[]>([]);
   const [completed, setCompleted] = useState(false);
@@ -234,7 +241,7 @@ export default function LessonBoard({
       <div className="chess-board-container w-full aspect-square rounded-xl overflow-hidden shadow-lg border-3 border-[#8b5e34]">
         <Chessboard
           options={{
-            position: game.fen(),
+            position: displayOnly ? safeFen : game.fen(),
             onPieceDrop: isInteractive ? handlePieceDrop : undefined,
             onSquareClick: isInteractive ? handleSquareClick : undefined,
             onPieceClick: isInteractive ? handlePieceClick : undefined,

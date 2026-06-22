@@ -5,7 +5,7 @@ import Image from 'next/image';
 import LessonBoard from '@/components/LessonBoard';
 import { pieceLessons, PieceLesson } from '@/lib/lessons';
 import { useGameStore } from '@/lib/store';
-import { generatePuzzles, Puzzle } from '@/lib/puzzle-generator';
+import { generatePuzzles, generatePiecePuzzles, Puzzle, PieceType } from '@/lib/puzzle-generator';
 import { Chess, Square } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
 import confetti from 'canvas-confetti';
@@ -13,32 +13,36 @@ import confetti from 'canvas-confetti';
 type View = 'hub' | 'lesson' | 'puzzle';
 
 const basicsLessons = [
-  { id: 'board-setup', label: 'Board &\nSetup', image: '/assets/lessons_images/Castle.png', lessonIndex: null },
-  { id: 'pawn', label: 'Meet the\nPawn', image: '/pieces/w-pawn.png', lessonIndex: 0 },
-  { id: 'rook', label: 'Meet the\nRook', image: '/pieces/w-rook.png', lessonIndex: 1 },
-  { id: 'knight', label: 'Meet the\nKnight', image: '/pieces/w-knight.png', lessonIndex: 2 },
-  { id: 'bishop', label: 'Meet the\nBishop', image: '/pieces/w-bishop.png', lessonIndex: 3 },
-  { id: 'queen', label: 'Meet the\nQueen', image: '/pieces/w-queen.png', lessonIndex: 4 },
-  { id: 'king', label: "King's\nSafety", image: '/pieces/w-king.png', lessonIndex: 5 },
-  { id: 'capture', label: 'Capture\nBasics', image: '/assets/lessons_images/swords.png', lessonIndex: null },
+  { id: 'board-setup', label: 'Board & Setup', image: '/assets/lessons_images/Castle.png', lessonIndex: 0 },
+  { id: 'pawn', label: 'Meet the Pawn', image: '/pieces/w-pawn.png', lessonIndex: 1 },
+  { id: 'rook', label: 'Meet the Rook', image: '/pieces/w-rook.png', lessonIndex: 2 },
+  { id: 'knight', label: 'Meet the Knight', image: '/pieces/w-knight.png', lessonIndex: 3 },
+  { id: 'bishop', label: 'Meet the Bishop', image: '/pieces/w-bishop.png', lessonIndex: 4 },
+  { id: 'queen', label: 'Meet the Queen', image: '/pieces/w-queen.png', lessonIndex: 5 },
+  { id: 'king', label: "King's Safety", image: '/pieces/w-king.png', lessonIndex: 6 },
+  { id: 'capture', label: 'Capture Basics', image: '/assets/lessons_images/swords.png', lessonIndex: null },
 ];
 
 const strategyLessons = [
   { id: 'castling', label: 'Castling', image: '/assets/lessons_images/Castle.png', lessonIndex: null },
-  { id: 'opening', label: 'Opening\nMoves', image: '/assets/lessons_images/King.png', lessonIndex: null },
-  { id: 'tactics', label: 'Combat\nTactics', image: '/assets/lessons_images/swords.png', lessonIndex: null },
-  { id: 'endgame', label: 'Endgame\nBasics', image: '/assets/lessons_images/Crown.png', lessonIndex: null },
+  { id: 'opening', label: 'Opening Moves', image: '/assets/lessons_images/King.png', lessonIndex: null },
+  { id: 'tactics', label: 'Combat Tactics', image: '/assets/lessons_images/swords.png', lessonIndex: null },
+  { id: 'endgame', label: 'Endgame Basics', image: '/assets/lessons_images/Crown.png', lessonIndex: null },
 ];
 
-const puzzleChallenges = [
-  { id: 'daily', label: 'Daily\nPuzzles', image: '/assets/lessons_images/chest.png' },
-  { id: 'pawn-puzzles', label: 'Pawn\nPuzzles', image: '/pieces/w-pawn.png' },
-  { id: 'checkmate', label: 'Checkmate\nTactic 1', image: '/assets/lessons_images/Crown.png' },
-  { id: 'checkmate2', label: 'Checkmate\nTactic 2', image: '/assets/lessons_images/Victory-cup.png' },
+const puzzleChallenges: { id: string; label: string; image: string; piece?: PieceType }[] = [
+  { id: 'pawn-puzzles', label: 'Pawn Puzzles', image: '/pieces/w-pawn.png', piece: 'pawn' },
+  { id: 'rook-puzzles', label: 'Rook Puzzles', image: '/pieces/w-rook.png', piece: 'rook' },
+  { id: 'knight-puzzles', label: 'Knight Puzzles', image: '/pieces/w-knight.png', piece: 'knight' },
+  { id: 'bishop-puzzles', label: 'Bishop Puzzles', image: '/pieces/w-bishop.png', piece: 'bishop' },
+  { id: 'queen-puzzles', label: 'Queen Puzzles', image: '/pieces/w-queen.png', piece: 'queen' },
+  { id: 'king-puzzles', label: 'King Puzzles', image: '/pieces/w-king.png', piece: 'king' },
+  { id: 'daily', label: 'Daily Puzzles', image: '/assets/lessons_images/chest.png' },
+  { id: 'checkmate', label: 'Checkmate in 1', image: '/assets/lessons_images/Crown.png' },
 ];
 
 export default function LearnPage() {
-  const { tutorialProgress, stats, currentDifficultyIndex, recordPuzzleSolved } = useGameStore();
+  const { tutorialProgress, currentDifficultyIndex, recordPuzzleSolved } = useGameStore();
   const [view, setView] = useState<View>('hub');
   const [activeLesson, setActiveLesson] = useState<PieceLesson | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -55,8 +59,12 @@ export default function LearnPage() {
     setView('lesson');
   }
 
-  function startPuzzles() {
-    setPuzzles(generatePuzzles(currentDifficultyIndex, 10));
+  function startPuzzles(piece?: PieceType) {
+    if (piece) {
+      setPuzzles(generatePiecePuzzles(piece));
+    } else {
+      setPuzzles(generatePuzzles(currentDifficultyIndex, 10));
+    }
     setCurrentPuzzleIndex(0);
     setView('puzzle');
   }
@@ -92,7 +100,7 @@ export default function LearnPage() {
   }
 
   return (
-    <div className="lessons-hub h-screen flex flex-col relative overflow-hidden">
+    <div className="lessons-hub h-full flex flex-col relative overflow-hidden">
       {/* Background - lessons hero image, no blur */}
       <div className="absolute inset-0 z-0">
         <Image src="/assets/lessons_images/Lessons_hero.png" alt="" fill className="object-cover object-center" priority />
@@ -100,13 +108,13 @@ export default function LearnPage() {
       </div>
 
       {/* Main layout */}
-      <div className="relative z-10 flex-1 flex flex-col lg:flex-row pt-16 md:pt-20 min-h-0">
+      <div className="relative z-10 flex-1 flex flex-col pt-16 md:pt-20 min-h-0">
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto px-4 md:px-8 lg:px-12 py-6 lg:py-8">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="lessons-hub-title text-3xl md:text-4xl lg:text-5xl font-black tracking-wide">
-              LESSONS HUB
+              
             </h1>
           </div>
 
@@ -173,10 +181,10 @@ export default function LearnPage() {
               <h2 className="lessons-hub-section-title">PUZZLES CHALLENGE: Test Your Skills!</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 p-5 md:p-6">
-              {puzzleChallenges.map((item, index) => (
+              {puzzleChallenges.map((item) => (
                 <button
                   key={item.id}
-                  onClick={startPuzzles}
+                  onClick={() => startPuzzles(item.piece)}
                   className="lessons-hub-card lessons-hub-card-puzzle"
                 >
                   <div className="lessons-hub-card-img">
@@ -185,66 +193,11 @@ export default function LearnPage() {
                   <span className="lessons-hub-card-label">{item.label.split('\n').map((line, i) => (
                     <span key={i}>{line}{i === 0 && <br />}</span>
                   ))}</span>
-                  {index === 0 && stats.puzzlesSolved > 0 && (
-                    <span className="lessons-hub-card-check">&#10003;</span>
-                  )}
                 </button>
               ))}
             </div>
           </section>
         </main>
-
-        {/* Right Sidebar - My Progress */}
-        <aside className="hidden lg:flex w-72 xl:w-80 shrink-0 flex-col border-l lessons-hub-sidebar overflow-y-auto">
-          <div className="p-5">
-            <h3 className="lessons-hub-sidebar-title text-center mb-4">My Progress</h3>
-
-            {/* Dragon character */}
-            <div className="flex justify-center mb-4">
-              <div className="lessons-hub-avatar">
-                <Image src="/assets/lessons_images/dragon.png" alt="Dragon mascot" width={64} height={64} className="object-contain" />
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="space-y-3">
-              <div className="lessons-hub-stat">
-                <span className="lessons-hub-stat-label">Level</span>
-                <span className="lessons-hub-stat-value">{stats.level}</span>
-              </div>
-              <div className="lessons-hub-stat">
-                <span className="lessons-hub-stat-label">XP</span>
-                <span className="lessons-hub-stat-value">{stats.xp}</span>
-              </div>
-              <div className="lessons-hub-stat">
-                <span className="lessons-hub-stat-label">Lessons</span>
-                <span className="lessons-hub-stat-value">{completedLessons}/{totalLessons}</span>
-              </div>
-              <div className="lessons-hub-stat">
-                <span className="lessons-hub-stat-label">Puzzles Solved</span>
-                <span className="lessons-hub-stat-value">{stats.puzzlesSolved}</span>
-              </div>
-              <div className="lessons-hub-stat">
-                <span className="lessons-hub-stat-label">Win Streak</span>
-                <span className="lessons-hub-stat-value">{stats.currentStreak}</span>
-              </div>
-            </div>
-
-            {/* XP Progress bar */}
-            <div className="mt-5">
-              <div className="flex items-center justify-between text-xs mb-1">
-                <span className="lessons-hub-stat-label">Next Level</span>
-                <span className="lessons-hub-stat-label">{stats.xp % 200}/{200} XP</span>
-              </div>
-              <div className="h-3 rounded-full overflow-hidden lessons-hub-xp-bar">
-                <div
-                  className="h-full rounded-full lessons-hub-xp-fill"
-                  style={{ width: `${((stats.xp % 200) / 200) * 100}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        </aside>
       </div>
     </div>
   );
@@ -252,12 +205,13 @@ export default function LearnPage() {
 
 function getDefaultFenForPiece(pieceId: string): string {
   const fens: Record<string, string> = {
-    pawn: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-    rook: 'r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1',
-    knight: 'r1bqkbnr/pppppppp/2n5/8/8/2N5/PPPPPPPP/R1BQKBNR w KQkq - 0 1',
-    bishop: 'r1bqk2r/pppppppp/2n2n2/2b5/2B5/2N2N2/PPPPPPPP/R1BQK2R w KQkq - 0 1',
-    queen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-    king: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    'board-setup': '8/8/8/8/8/8/8/8 w - - 0 1',
+    pawn: '8/pppppppp/8/8/8/8/PPPPPPPP/8 w - - 0 1',
+    rook: 'r6r/8/8/8/8/8/8/R6R w - - 0 1',
+    knight: '1n4n1/8/8/8/8/8/8/1N4N1 w - - 0 1',
+    bishop: '2b2b2/8/8/8/8/8/8/2B2B2 w - - 0 1',
+    queen: '3q4/8/8/8/8/8/8/3Q4 w - - 0 1',
+    king: '4k3/8/8/8/8/8/8/4K3 w - - 0 1',
   };
   return fens[pieceId] || 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 }
@@ -294,7 +248,7 @@ function LessonView({
   }
 
   return (
-    <div className="lessons-hub h-screen flex flex-col relative overflow-hidden">
+    <div className="lessons-hub h-full flex flex-col relative overflow-hidden">
       {/* Background — lessons_background.png */}
       <div className="absolute inset-0 z-0">
         <Image src="/assets/lessons_images/lessons_background.png" alt="" fill className="object-cover object-center" priority />
@@ -381,7 +335,7 @@ function LessonView({
                   onClick={handleComplete}
                   className="lesson-big-btn lesson-big-btn-complete"
                 >
-                  {isCompleted ? '&#10003; Done!' : '&#11088; Complete!'}
+                  {isCompleted ? '✓ Done!' : '⭐ Complete!'}
                 </button>
               )}
             </div>
@@ -410,13 +364,16 @@ function PuzzleView({
   const [showHint, setShowHint] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [attempts, setAttempts] = useState(0);
+  const [initialTurn, setInitialTurn] = useState<'w' | 'b'>(() => new Chess(puzzles[0].fen).turn());
 
   const currentPuzzle = puzzles[currentIndex];
-  const turn = game.turn() === 'w' ? 'White' : 'Black';
+  const turn = initialTurn === 'w' ? 'White' : 'Black';
 
   function loadPuzzle(index: number) {
     const puzzle = puzzles[index];
-    setGame(new Chess(puzzle.fen));
+    const newGame = new Chess(puzzle.fen);
+    setGame(newGame);
+    setInitialTurn(newGame.turn());
     setSolved(false);
     setShowHint(false);
     setFeedback('');
@@ -435,11 +392,12 @@ function PuzzleView({
       });
       if (!move) return false;
 
-      const expectedMove = currentPuzzle.solution[0];
-      if (move.san === expectedMove) {
+      const expectedMove = currentPuzzle.solution[0].replace(/[+#]/g, '');
+      const actualMove = move.san.replace(/[+#]/g, '');
+      if (actualMove === expectedMove) {
         setGame(newGame);
         setSolved(true);
-        setFeedback('Correct! Well done!');
+        setFeedback('Correct!');
         recordPuzzleSolved();
         confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 }, colors: ['#8b6914', '#d4a843', '#f5d77a'] });
       } else {
@@ -447,73 +405,96 @@ function PuzzleView({
         setFeedback(attempts >= 1 ? 'Not quite... try using the hint!' : 'Not quite... try again!');
         newGame.undo();
       }
-      return move.san === expectedMove;
+      return actualMove === expectedMove;
     } catch {
       return false;
     }
   }
 
   return (
-    <div className="lessons-hub h-screen flex flex-col relative overflow-hidden">
+    <div className="lessons-hub h-full flex flex-col relative overflow-hidden">
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 lessons-hub-bg" />
+        <Image src="/assets/lessons_images/lessons_background.png" alt="" fill className="object-cover object-center" priority />
+        <div className="absolute inset-0 bg-black/20" />
       </div>
 
       <div className="relative z-10 flex-1 flex flex-col pt-16 md:pt-20 min-h-0">
-        <div className="px-4 md:px-8 flex items-center gap-4 py-3 lessons-hub-topbar">
-          <button onClick={onBack} className="lessons-hub-back-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6" /></svg>
-            Back
+        {/* Progress strip matching lesson view */}
+        <div className="px-4 md:px-8 py-1.5 flex items-center gap-2">
+          <button onClick={onBack} className="lessons-hub-back-btn shrink-0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M15 18l-6-6 6-6" /></svg>
           </button>
-          <div className="flex-1 min-w-0">
-            <h2 className="font-bold text-[#3d2b1a] text-base md:text-lg">Puzzle Chamber</h2>
-            <p className="text-xs text-[#8b6914]">Puzzle {currentIndex + 1} of {puzzles.length}</p>
+          <div className="flex-1 h-2 rounded-full bg-[#5c3a10]/40 overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-[#d4a843] to-[#f5d77a]"
+              style={{ width: `${((currentIndex + 1) / puzzles.length) * 100}%` }}
+            />
           </div>
+          <span className="text-xs font-bold text-[#f5d77a] shrink-0">
+            {currentIndex + 1}/{puzzles.length}
+          </span>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6">
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-4">
-              <h3 className="font-bold text-lg text-[#3d2b1a]">{currentPuzzle.title}</h3>
-              <p className="text-sm text-[#5a4320]">{currentPuzzle.description}</p>
-              <p className="text-xs text-[#8b6914] mt-1">{turn} to move</p>
+        {/* Main puzzle area — side-by-side: board left, text right */}
+        <div className="flex-1 flex flex-col lg:flex-row items-center lg:items-stretch justify-center px-4 md:px-8 lg:px-12 py-4 gap-6 lg:gap-10 overflow-y-auto">
+          {/* Board — left side */}
+          <div className="w-full max-w-[min(60vh,440px)] lg:max-w-[min(65vh,500px)] aspect-square shrink-0">
+            <div className="chess-board-container w-full aspect-square rounded-xl overflow-hidden border-2 border-[#d4a843]">
+              <PuzzleBoard game={game} onPieceDrop={handlePieceDrop} solved={solved} orientation={initialTurn} />
+            </div>
+          </div>
+
+          {/* Text panel — right side */}
+          <div className="flex flex-col justify-center items-center lg:items-start gap-4 lg:gap-5 lg:max-w-sm">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-white text-center lg:text-left drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]">
+              {currentPuzzle.title}
+            </h2>
+
+            <div className="lesson-instruction-bubble">
+              <span className="text-lg md:text-xl">&#127919;</span>
+              <p className="text-lg md:text-xl font-bold text-[#2d6b22]">{currentPuzzle.description}</p>
             </div>
 
-            <div className="chess-board-container w-full max-w-[min(80vw,480px)] mx-auto aspect-square rounded-xl overflow-hidden border-2 border-[#d4a843]">
-              <PuzzleBoard game={game} onPieceDrop={handlePieceDrop} />
-            </div>
+            <p className="text-sm text-[#f5d77a] font-semibold">{turn} to move</p>
 
             {feedback && (
-              <div className={`mt-4 text-center p-3 rounded-xl ${
-                solved ? 'bg-green-50 border border-green-300' : 'bg-red-50 border border-red-300'
+              <div className={`p-3 rounded-xl w-full ${
+                solved ? 'bg-green-50/90 border border-green-300' : 'bg-red-50/90 border border-red-300'
               }`}>
-                <p className="font-bold text-sm text-[#3d2b1a]">{feedback}</p>
+                <p className={`font-bold text-sm ${solved ? 'text-green-700' : 'text-red-700'}`}>{feedback}</p>
               </div>
             )}
 
-            <div className="flex gap-3 mt-4 justify-center">
+            {/* Action buttons */}
+            <div className="flex items-center gap-3 flex-wrap">
               {!solved && (
                 <button
                   onClick={() => setShowHint(!showHint)}
-                  className="lessons-hub-nav-btn lessons-hub-nav-btn-secondary text-sm"
+                  className="lesson-big-btn lesson-big-btn-back text-sm"
                 >
                   {showHint ? 'Hide Hint' : 'Show Hint'}
                 </button>
               )}
               {solved && currentIndex < puzzles.length - 1 && (
-                <button onClick={() => loadPuzzle(currentIndex + 1)} className="lessons-hub-nav-btn lessons-hub-nav-btn-primary text-sm">
-                  Next Puzzle
+                <button onClick={() => loadPuzzle(currentIndex + 1)} className="lesson-big-btn lesson-big-btn-next text-sm">
+                  Next Puzzle &#9654;
+                </button>
+              )}
+              {solved && currentIndex === puzzles.length - 1 && (
+                <button onClick={onBack} className="lesson-big-btn lesson-big-btn-complete text-sm">
+                  &#11088; All Done!
                 </button>
               )}
             </div>
 
             {showHint && !solved && (
-              <div className="mt-3 p-3 rounded-xl bg-[#fef9e7] border border-[#f5d77a] max-w-md mx-auto">
+              <div className="p-3 rounded-xl bg-[#fef9e7]/90 border border-[#f5d77a] w-full">
                 <p className="text-sm text-[#8b6914]">{currentPuzzle.hint}</p>
               </div>
             )}
 
-            <div className="mt-6 flex gap-2 flex-wrap justify-center">
+            {/* Puzzle navigation dots */}
+            <div className="flex gap-2 flex-wrap mt-2">
               {puzzles.map((_, index) => (
                 <button
                   key={index}
@@ -537,17 +518,92 @@ function PuzzleView({
   );
 }
 
-function PuzzleBoard({ game, onPieceDrop }: { game: Chess; onPieceDrop: (args: { piece: { isSparePiece: boolean; position: string; pieceType: string }; sourceSquare: string; targetSquare: string | null }) => boolean }) {
+function PuzzleBoard({ game, onPieceDrop, solved, orientation }: { game: Chess; onPieceDrop: (args: { piece: { isSparePiece: boolean; position: string; pieceType: string }; sourceSquare: string; targetSquare: string | null }) => boolean; solved: boolean; orientation: 'w' | 'b' }) {
+  const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
+  const [legalMoves, setLegalMoves] = useState<string[]>([]);
+
+  const turn = game.turn();
+
+  function selectPiece(square: string) {
+    const piece = game.get(square as Square);
+    if (!piece || piece.color !== turn) {
+      setSelectedSquare(null);
+      setLegalMoves([]);
+      return;
+    }
+    setSelectedSquare(square);
+    const moves = game.moves({ square: square as Square, verbose: true });
+    setLegalMoves(moves.map(m => m.to));
+  }
+
+  function handleSquareClick({ square }: { piece: { pieceType: string } | null; square: string }) {
+    if (solved) return;
+    if (selectedSquare) {
+      if (legalMoves.includes(square)) {
+        const success = onPieceDrop({ piece: { isSparePiece: false, position: '', pieceType: '' }, sourceSquare: selectedSquare, targetSquare: square });
+        setSelectedSquare(null);
+        setLegalMoves([]);
+        if (!success) return;
+        return;
+      }
+      const piece = game.get(square as Square);
+      if (piece && piece.color === turn) {
+        selectPiece(square);
+        return;
+      }
+      setSelectedSquare(null);
+      setLegalMoves([]);
+      return;
+    }
+    selectPiece(square);
+  }
+
+  function handlePieceClick({ square }: { isSparePiece: boolean; piece: { pieceType: string }; square: string | null }) {
+    if (solved || !square) return;
+    if (selectedSquare && selectedSquare !== square && legalMoves.includes(square)) {
+      onPieceDrop({ piece: { isSparePiece: false, position: '', pieceType: '' }, sourceSquare: selectedSquare, targetSquare: square });
+      setSelectedSquare(null);
+      setLegalMoves([]);
+      return;
+    }
+    selectPiece(square);
+  }
+
+  const squareStyles: Record<string, React.CSSProperties> = {};
+  if (selectedSquare) {
+    squareStyles[selectedSquare] = {
+      backgroundColor: 'rgba(255, 215, 0, 0.6)',
+      boxShadow: 'inset 0 0 8px rgba(255, 215, 0, 0.8)',
+    };
+  }
+  for (const sq of legalMoves) {
+    const targetPiece = game.get(sq as Square);
+    if (targetPiece) {
+      squareStyles[sq] = {
+        background: 'radial-gradient(circle, transparent 55%, rgba(255, 80, 80, 0.7) 55%)',
+        borderRadius: '50%',
+      };
+    } else {
+      squareStyles[sq] = {
+        background: 'radial-gradient(circle, rgba(0, 200, 100, 0.7) 25%, transparent 25%)',
+      };
+    }
+  }
+
   return (
     <Chessboard
       options={{
         position: game.fen(),
-        onPieceDrop: onPieceDrop,
-        boardOrientation: game.turn() === 'w' ? 'white' : 'black',
+        onPieceDrop: solved ? undefined : onPieceDrop,
+        onSquareClick: solved ? undefined : handleSquareClick,
+        onPieceClick: solved ? undefined : handlePieceClick,
+        canDragPiece: solved ? () => false : ({ piece }: { piece: { pieceType: string } }) => piece.pieceType.charAt(0) === turn,
+        boardOrientation: orientation === 'w' ? 'white' : 'black',
         boardStyle: { borderRadius: '12px' },
-        darkSquareStyle: { backgroundColor: '#8b6914' },
-        lightSquareStyle: { backgroundColor: '#f5e6c8' },
-        animationDurationInMs: 300,
+        darkSquareStyle: { backgroundColor: '#b58863' },
+        lightSquareStyle: { backgroundColor: '#f0d9b5' },
+        squareStyles,
+        animationDurationInMs: 250,
       }}
     />
   );

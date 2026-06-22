@@ -691,7 +691,7 @@ body:has(.play-page-container) > main {
 }
 
 .lessons-hub-bg {
-  background: linear-gradient(180deg, rgba(245, 230, 200, 0.35) 0%, rgba(237, 224, 192, 0.4) 40%, rgba(232, 213, 163, 0.5) 100%);
+  background: linear-gradient(#00000059 0%, #00000066 40%, #e8d5a380 100%);
 }
 
 .lessons-hub-title {
@@ -1317,7 +1317,7 @@ body:has(.play-page-container) > main {
   }
 
   .lessons-hub .lessons-hub-card-label {
-    font-size: 0.7vw;
+    font-size: 1vw;
   }
 
   .lessons-hub .lessons-hub-card-check {

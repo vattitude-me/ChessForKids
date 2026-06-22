@@ -31,6 +31,42 @@ export interface PieceLesson {
 
 export const pieceLessons: PieceLesson[] = [
   {
+    id: 'board-setup',
+    piece: '',
+    name: 'Board & Setup',
+    icon: '♔',
+    symbol: '',
+    color: '#8b6914',
+    tagline: 'Learn how to set up the chess board!',
+    steps: [
+      {
+        type: 'intro',
+        title: 'The Chess Board',
+        description: 'A chess board has 64 squares — 8 rows and 8 columns. The squares alternate between light and dark colors. Each player starts with 16 pieces.',
+        fen: '8/8/8/8/8/8/8/8 w - - 0 1',
+      },
+      {
+        type: 'demo',
+        title: 'Where the Pieces Go',
+        description: 'Each piece has its own starting square. Rooks go in the corners, then Knights, then Bishops. The Queen goes on her own color, and the King goes next to her. Pawns fill the entire second row!',
+        fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        highlightSquares: ['a1', 'h1', 'b1', 'g1', 'c1', 'f1', 'd1', 'e1'],
+      },
+      {
+        type: 'demo',
+        title: 'The Two Armies',
+        description: 'White pieces always start on rows 1 and 2. Black pieces start on rows 7 and 8. White always moves first! Each side has: 8 Pawns, 2 Rooks, 2 Knights, 2 Bishops, 1 Queen, and 1 King.',
+        fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        highlightSquares: ['a2', 'b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2', 'a7', 'b7', 'c7', 'd7', 'e7', 'f7', 'g7', 'h7'],
+      },
+      {
+        type: 'summary',
+        title: 'Board Setup Complete!',
+        description: 'You now know how to set up a chess board! Remember:\n• Light square in the bottom-right corner\n• Queen on her own color\n• White moves first\n• Each side has 16 pieces total!',
+      },
+    ],
+  },
+  {
     id: 'pawn',
     piece: 'P',
     name: 'The Pawn',

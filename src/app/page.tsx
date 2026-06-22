@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import Footer from '@/components/Footer';
 
 function FeatureCTA({ href, icon, title, description }: { href: string; icon: React.ReactNode; title: string; description: string }) {
   return (
@@ -96,6 +97,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   );
 }

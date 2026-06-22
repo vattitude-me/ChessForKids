@@ -95,7 +95,7 @@ export default function PlayPage() {
   }
 
   return (
-    <div className="play-page-light h-screen flex flex-col relative overflow-hidden play-page-container">
+    <div className="play-page-light h-full flex flex-col relative overflow-hidden play-page-container">
       {/* Hero image blur background */}
       <div className="absolute inset-0 z-0">
         <Image

@@ -7,15 +7,13 @@ import { usePathname } from 'next/navigation';
 const navItems = [
   { href: '/', label: 'Home', icon: 'home' },
   { href: '/learn', label: 'Lessons', icon: 'book' },
-  { href: '/progress', label: 'Progress', icon: 'chart' },
-  { href: '/play', label: 'Battle', icon: 'battle' },
+  { href: '/play', label: 'Play Game', icon: 'battle' },
 ];
 
 const mobileNavItems = [
   { href: '/', label: 'Home', icon: '🏰' },
   { href: '/learn', label: 'Lessons', icon: '📚' },
-  { href: '/play', label: 'Battle', icon: '⚔️' },
-  { href: '/progress', label: 'Progress', icon: '📈' },
+  { href: '/play', label: 'Play', icon: '⚔️' },
 ];
 
 function NavIcon({ type, active }: { type: string; active: boolean }) {
