@@ -30,15 +30,15 @@ const strategyLessons = [
   { id: 'endgame', label: 'Endgame Basics', image: '/assets/lessons_images/Crown.png', lessonIndex: null },
 ];
 
-const puzzleChallenges: { id: string; label: string; image: string; piece?: PieceType }[] = [
+const puzzleChallenges: { id: string; label: string; image: string; piece?: PieceType; mode?: 'checkmate' | 'daily' }[] = [
   { id: 'pawn-puzzles', label: 'Pawn Puzzles', image: '/pieces/w-pawn.png', piece: 'pawn' },
   { id: 'rook-puzzles', label: 'Rook Puzzles', image: '/pieces/w-rook.png', piece: 'rook' },
   { id: 'knight-puzzles', label: 'Knight Puzzles', image: '/pieces/w-knight.png', piece: 'knight' },
   { id: 'bishop-puzzles', label: 'Bishop Puzzles', image: '/pieces/w-bishop.png', piece: 'bishop' },
   { id: 'queen-puzzles', label: 'Queen Puzzles', image: '/pieces/w-queen.png', piece: 'queen' },
   { id: 'king-puzzles', label: 'King Puzzles', image: '/pieces/w-king.png', piece: 'king' },
-  { id: 'daily', label: 'Daily Puzzles', image: '/assets/lessons_images/chest.png' },
-  { id: 'checkmate', label: 'Checkmate in 1', image: '/assets/lessons_images/Crown.png' },
+  { id: 'daily', label: 'Daily Puzzles', image: '/assets/lessons_images/chest.png', mode: 'daily' },
+  { id: 'checkmate', label: 'Checkmate in 1', image: '/assets/lessons_images/Crown.png', mode: 'checkmate' },
 ];
 
 export default function LearnPage() {
@@ -59,11 +59,11 @@ export default function LearnPage() {
     setView('lesson');
   }
 
-  function startPuzzles(piece?: PieceType) {
+  function startPuzzles(piece?: PieceType, mode?: 'checkmate' | 'daily') {
     if (piece) {
       setPuzzles(generatePiecePuzzles(piece));
     } else {
-      setPuzzles(generatePuzzles(currentDifficultyIndex, 10));
+      setPuzzles(generatePuzzles(currentDifficultyIndex, 10, mode));
     }
     setCurrentPuzzleIndex(0);
     setView('puzzle');
@@ -118,85 +118,90 @@ export default function LearnPage() {
             </h1>
           </div>
 
-          {/* THE BASICS Section */}
-          <section className="lessons-hub-section mb-8">
-            <div className="lessons-hub-section-header">
-              <h2 className="lessons-hub-section-title">THE BASICS: Learn to Play!</h2>
-              <span className="lessons-hub-progress-badge">
-                {completedLessons} of {totalLessons} Lessons Completed
-              </span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 p-5 md:p-6">
-              {basicsLessons.map((item) => {
-                const isAvailable = item.lessonIndex !== null && item.lessonIndex < pieceLessons.length;
-                const isComplete = item.lessonIndex !== null && tutorialProgress.includes(item.lessonIndex + 100);
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => isAvailable && startLesson(item.lessonIndex)}
-                    className={`lessons-hub-card ${isComplete ? 'lessons-hub-card-complete' : ''} ${!isAvailable ? 'lessons-hub-card-locked' : ''}`}
-                    disabled={!isAvailable}
-                  >
-                    <div className="lessons-hub-card-img">
-                      <Image src={item.image} alt={item.label} width={64} height={64} className="object-contain" style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }} />
-                    </div>
-                    <span className="lessons-hub-card-label">{item.label.split('\n').map((line, i) => (
-                      <span key={i}>{line}{i === 0 && <br />}</span>
-                    ))}</span>
-                    {isComplete && <span className="lessons-hub-card-check">&#10003;</span>}
-                    {!isAvailable && <span className="lessons-hub-card-lock">&#128274;</span>}
-                  </button>
-                );
-              })}
-            </div>
-          </section>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] xl:grid-cols-[1fr_420px] gap-6 lg:gap-8 items-start">
+            {/* Left Column: Lessons */}
+            <div className="min-w-0">
+              {/* THE BASICS Section */}
+              <section className="lessons-hub-section mb-8">
+                <div className="lessons-hub-section-header">
+                  <h2 className="lessons-hub-section-title">THE BASICS: Learn to Play!</h2>
+                  <span className="lessons-hub-progress-badge">
+                    {completedLessons} of {totalLessons} Lessons Completed
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5 p-5 md:p-6">
+                  {basicsLessons.map((item) => {
+                    const isAvailable = item.lessonIndex !== null && item.lessonIndex < pieceLessons.length;
+                    const isComplete = item.lessonIndex !== null && tutorialProgress.includes(item.lessonIndex + 100);
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => isAvailable && startLesson(item.lessonIndex)}
+                        className={`lessons-hub-card ${isComplete ? 'lessons-hub-card-complete' : ''} ${!isAvailable ? 'lessons-hub-card-locked' : ''}`}
+                        disabled={!isAvailable}
+                      >
+                        <div className="lessons-hub-card-img">
+                          <Image src={item.image} alt={item.label} width={64} height={64} className="object-contain" style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }} />
+                        </div>
+                        <span className="lessons-hub-card-label">{item.label.split('\n').map((line, i) => (
+                          <span key={i}>{line}{i === 0 && <br />}</span>
+                        ))}</span>
+                        {isComplete && <span className="lessons-hub-card-check">&#10003;</span>}
+                        {!isAvailable && <span className="lessons-hub-card-lock">&#128274;</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
 
-          {/* STRATEGY Section */}
-          <section className="lessons-hub-section mb-8">
-            <div className="lessons-hub-section-header lessons-hub-section-header-strategy">
-              <h2 className="lessons-hub-section-title">STRATEGY: Level Up Your Game!</h2>
+              {/* STRATEGY Section */}
+              <section className="lessons-hub-section mb-8">
+                <div className="lessons-hub-section-header lessons-hub-section-header-strategy">
+                  <h2 className="lessons-hub-section-title">STRATEGY: Level Up Your Game!</h2>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5 p-5 md:p-6">
+                  {strategyLessons.map((item) => (
+                    <button
+                      key={item.id}
+                      className="lessons-hub-card lessons-hub-card-locked"
+                      disabled
+                    >
+                      <div className="lessons-hub-card-img">
+                        <Image src={item.image} alt={item.label} width={64} height={64} className="object-contain" style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }} />
+                      </div>
+                      <span className="lessons-hub-card-label">{item.label.split('\n').map((line, i) => (
+                        <span key={i}>{line}{i === 0 && <br />}</span>
+                      ))}</span>
+                      <span className="lessons-hub-card-lock">&#128274;</span>
+                    </button>
+                  ))}
+                </div>
+              </section>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 p-5 md:p-6">
-              {strategyLessons.map((item) => (
-                <button
-                  key={item.id}
-                  className="lessons-hub-card lessons-hub-card-locked"
-                  disabled
-                >
-                  <div className="lessons-hub-card-img">
-                    <Image src={item.image} alt={item.label} width={64} height={64} className="object-contain" style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }} />
-                  </div>
-                  <span className="lessons-hub-card-label">{item.label.split('\n').map((line, i) => (
-                    <span key={i}>{line}{i === 0 && <br />}</span>
-                  ))}</span>
-                  <span className="lessons-hub-card-lock">&#128274;</span>
-                </button>
-              ))}
-            </div>
-          </section>
 
-          {/* PUZZLES CHALLENGE Section */}
-          <section className="lessons-hub-section mb-8">
-            <div className="lessons-hub-section-header lessons-hub-section-header-puzzles">
-              <h2 className="lessons-hub-section-title">PUZZLES CHALLENGE: Test Your Skills!</h2>
+            {/* Right Column: Puzzles */}
+            <div>
+              <section className="lessons-hub-section lg:sticky lg:top-24">
+                <div className="lessons-hub-section-header lessons-hub-section-header-puzzles">
+                  <h2 className="lessons-hub-section-title">PUZZLES CHALLENGE</h2>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-3 p-4 md:p-5">
+                  {puzzleChallenges.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => startPuzzles(item.piece, item.mode)}
+                      className="lessons-hub-card lessons-hub-card-puzzle lessons-hub-card-vertical"
+                    >
+                      <div className="lessons-hub-card-img">
+                        <Image src={item.image} alt={item.label} width={48} height={48} className="object-contain" style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }} />
+                      </div>
+                      <span className="lessons-hub-card-label">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </section>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 p-5 md:p-6">
-              {puzzleChallenges.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => startPuzzles(item.piece)}
-                  className="lessons-hub-card lessons-hub-card-puzzle"
-                >
-                  <div className="lessons-hub-card-img">
-                    <Image src={item.image} alt={item.label} width={64} height={64} className="object-contain" style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }} />
-                  </div>
-                  <span className="lessons-hub-card-label">{item.label.split('\n').map((line, i) => (
-                    <span key={i}>{line}{i === 0 && <br />}</span>
-                  ))}</span>
-                </button>
-              ))}
-            </div>
-          </section>
+          </div>
         </main>
       </div>
     </div>

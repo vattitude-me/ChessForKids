@@ -857,6 +857,24 @@ body:has(.play-page-container) > main {
   border-color: #a0475a;
 }
 
+.lessons-hub-card-vertical {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 14px 10px;
+  gap: 8px;
+}
+
+.lessons-hub-card-vertical .lessons-hub-card-img {
+  width: 44px;
+  height: 44px;
+}
+
+.lessons-hub-card-vertical .lessons-hub-card-label {
+  font-size: 0.85rem;
+  flex: none;
+}
+
 .lessons-hub-card-img {
   width: 64px;
   height: 64px;

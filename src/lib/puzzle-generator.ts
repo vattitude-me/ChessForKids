@@ -1,4 +1,5 @@
 import { Chess, Move } from 'chess.js';
+import { generateDynamicPuzzles, generateDailyPuzzles } from './puzzle-engine';
 
 export interface Puzzle {
   id: string;
@@ -57,7 +58,7 @@ const bishopPuzzles: { fen: string; solution: string[]; title: string; hint: str
 const queenPuzzles: { fen: string; solution: string[]; title: string; hint: string; description: string }[] = [
   { fen: '4k3/pp4pp/8/8/3p4/8/PP3PPP/3QK3 w - - 0 1', solution: ['Qxd4'], title: 'Queen Captures', hint: 'The queen is the most powerful piece — she can go straight or diagonal! Grab that pawn!', description: 'Capture the pawn with the queen!' },
   { fen: '6k1/5ppp/8/8/8/8/PP3PPP/3QK3 w - - 0 1', solution: ['Qd8'], title: 'Queen Checkmate', hint: 'Move your queen to the top row — the king is stuck and cannot escape!', description: 'Checkmate!' },
-  { fen: '4k3/pp4pp/8/8/2p5/8/PP3PPP/2Q1K3 w - - 0 1', solution: ['Qxc4'], title: 'Queen Diagonal', hint: 'Your queen can slide diagonally — look for the pawn on a diagonal line!', description: 'Capture diagonally!' },
+  { fen: '4k3/pp4pp/8/8/5p2/8/PP3PPP/3QK3 w - - 0 1', solution: ['Qxf4'], title: 'Queen Diagonal', hint: 'Your queen can slide diagonally — look for the pawn on a diagonal line!', description: 'Capture diagonally!' },
   { fen: '4k3/pp4pp/4p3/8/8/8/PP2QPPP/4K3 w - - 0 1', solution: ['Qxe6'], title: 'Queen Power', hint: 'The queen can zoom across the whole board — slide her straight up to eat that pawn!', description: 'Capture the pawn!' },
   { fen: '6k1/5ppp/8/8/8/4Q3/PP3PPP/4K3 w - - 0 1', solution: ['Qe8'], title: 'Queen Mate', hint: 'The king is trapped on the top row with no escape — send your queen there!', description: 'Deliver checkmate!' },
 ];
@@ -91,62 +92,13 @@ function generatePuzzleId(): string {
   return 'puzzle_' + Math.random().toString(36).substring(2, 10);
 }
 
-export function generatePuzzles(difficulty: number, count: number): Puzzle[] {
-  const puzzles: Puzzle[] = [];
-  const maxDifficulty = 7;
-  const normalizedDiff = Math.min(difficulty, maxDifficulty) / maxDifficulty;
-
-  if (normalizedDiff < 0.3) {
-    const available = mateIn1Positions.slice(0, Math.max(3, Math.floor(mateIn1Positions.length * (normalizedDiff + 0.3))));
-    for (let i = 0; i < count; i++) {
-      const pos = available[i % available.length];
-      puzzles.push({
-        id: generatePuzzleId(),
-        fen: pos.fen,
-        solution: pos.solution,
-        theme: 'mate_in_1',
-        difficulty,
-        title: pos.title,
-        hint: puzzleThemes.find(t => t.name === 'mate_in_1')?.hint || 'Look for checkmate!',
-        description: puzzleThemes.find(t => t.name === 'mate_in_1')?.description || 'Find checkmate!',
-      });
-    }
-  } else if (normalizedDiff < 0.6) {
-    const allPositions = [...mateIn1Positions.slice(3), ...tacticalPositions];
-    for (let i = 0; i < count; i++) {
-      const pos = allPositions[i % allPositions.length];
-      const theme = 'solution' in pos && pos.solution.length === 1 ? 'mate_in_1' :
-        ('theme' in pos ? (pos as { theme: string }).theme : 'capture');
-      puzzles.push({
-        id: generatePuzzleId(),
-        fen: pos.fen,
-        solution: pos.solution,
-        theme,
-        difficulty,
-        title: pos.title,
-        hint: puzzleThemes.find(t => t.name === theme)?.hint || 'Think carefully!',
-        description: puzzleThemes.find(t => t.name === theme)?.description || 'Solve the puzzle!',
-      });
-    }
-  } else {
-    const allPositions = [...tacticalPositions, ...mateIn1Positions.slice(4)];
-    for (let i = 0; i < count; i++) {
-      const pos = allPositions[i % allPositions.length];
-      const theme = 'theme' in pos ? (pos as { theme: string }).theme : 'mate_in_1';
-      puzzles.push({
-        id: generatePuzzleId(),
-        fen: pos.fen,
-        solution: pos.solution,
-        theme,
-        difficulty,
-        title: pos.title,
-        hint: puzzleThemes.find(t => t.name === theme)?.hint || 'Think several moves ahead!',
-        description: puzzleThemes.find(t => t.name === theme)?.description || 'Find the best move!',
-      });
-    }
+export function generatePuzzles(difficulty: number, count: number, mode?: 'checkmate' | 'daily'): Puzzle[] {
+  // Use dynamic engine for mate-in-1 and daily puzzles — never repeats
+  if (mode === 'daily') {
+    return generateDailyPuzzles(count);
   }
 
-  return puzzles;
+  return generateDynamicPuzzles(difficulty, count);
 }
 
 export function generateRandomPuzzle(difficulty: number): Puzzle {
