@@ -1457,3 +1457,818 @@ body:has(.play-page-container) > main {
     padding: 0.6vw 1.5vw;
   }
 }
+
+/* ============================================================
+   REDESIGNED LEARN PAGE — Adventure Progression Theme
+   ============================================================ */
+
+.learn-page {
+  background: transparent;
+}
+
+.learn-page-overlay {
+  background: linear-gradient(180deg, rgba(10, 6, 20, 0.82) 0%, rgba(15, 10, 30, 0.75) 40%, rgba(20, 12, 35, 0.88) 100%);
+}
+
+/* Hero Continue Banner */
+.learn-hero-banner {
+  background: linear-gradient(135deg, rgba(139, 105, 20, 0.15), rgba(212, 168, 67, 0.1));
+  border: 2px solid rgba(212, 168, 67, 0.4);
+  border-radius: 20px;
+  padding: 4px;
+  box-shadow:
+    0 8px 32px rgba(139, 105, 20, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.learn-hero-inner {
+  background: linear-gradient(135deg, rgba(30, 20, 50, 0.95), rgba(45, 30, 60, 0.9));
+  border-radius: 16px;
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.learn-hero-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.learn-hero-player-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.learn-hero-player-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2a1f45, #3d2b5c);
+  border: 2px solid #d4a843;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px rgba(212, 168, 67, 0.3);
+}
+
+.learn-hero-player-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.learn-hero-player-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #d4a843;
+}
+
+.learn-hero-player-xp {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(212, 168, 67, 0.7);
+}
+
+.learn-hero-heading {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.learn-hero-heading-gold {
+  background: linear-gradient(135deg, #ffd700, #f5c518, #d4a843);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.learn-hero-subtext {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.learn-hero-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.learn-hero-progress-bar {
+  flex: 1;
+  max-width: 200px;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.learn-hero-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #d4a843, #ffd700);
+  transition: width 0.6s ease;
+  box-shadow: 0 0 8px rgba(212, 168, 67, 0.5);
+}
+
+.learn-hero-progress-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+}
+
+.learn-hero-right {
+  display: flex;
+  align-items: center;
+}
+
+.learn-hero-cta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 36px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #d4a843, #8b6914);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.15rem;
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow:
+    0 6px 20px rgba(212, 168, 67, 0.35),
+    0 0 30px rgba(212, 168, 67, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.learn-hero-cta::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: rotate(45deg);
+  animation: shimmer 3s infinite;
+}
+
+.learn-hero-cta:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 10px 30px rgba(212, 168, 67, 0.5),
+    0 0 40px rgba(212, 168, 67, 0.25);
+}
+
+.learn-hero-cta:active {
+  transform: scale(0.97);
+}
+
+.learn-hero-cta-icon {
+  font-size: 1.1rem;
+}
+
+/* Sections */
+.learn-section {
+  background: rgba(20, 14, 35, 0.85);
+  border: 2px solid rgba(212, 168, 67, 0.3);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.learn-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(212, 168, 67, 0.2);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.learn-section-header-basics {
+  background: linear-gradient(135deg, rgba(139, 105, 20, 0.3), rgba(100, 75, 15, 0.2));
+}
+
+.learn-section-header-strategy {
+  background: linear-gradient(135deg, rgba(44, 95, 45, 0.3), rgba(30, 70, 30, 0.2));
+}
+
+.learn-section-header-puzzles {
+  background: linear-gradient(135deg, rgba(123, 45, 59, 0.3), rgba(90, 30, 45, 0.2));
+}
+
+.learn-section-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fef9e7;
+  letter-spacing: 0.03em;
+}
+
+.learn-section-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #d4a843;
+  background: rgba(212, 168, 67, 0.1);
+  border: 1px solid rgba(212, 168, 67, 0.3);
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.learn-section-badge-locked {
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Learning Path — Vertical Journey Nodes */
+.learn-path-container {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.learn-path-container-locked {
+  opacity: 0.5;
+  filter: grayscale(0.3);
+}
+
+.learn-path-node {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  text-align: left;
+}
+
+.learn-path-node:hover:not(:disabled) {
+  background: rgba(212, 168, 67, 0.08);
+  border-color: rgba(212, 168, 67, 0.3);
+  transform: translateX(4px);
+}
+
+.learn-path-node:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.learn-path-node-connector {
+  position: absolute;
+  left: 42px;
+  top: -4px;
+  width: 3px;
+  height: 4px;
+  background: rgba(212, 168, 67, 0.2);
+}
+
+.learn-path-node:first-child .learn-path-node-connector {
+  display: none;
+}
+
+.learn-path-node-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(30, 22, 50, 0.8);
+  border: 3px solid rgba(212, 168, 67, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.learn-path-node:hover:not(:disabled) .learn-path-node-circle {
+  border-color: #d4a843;
+  box-shadow: 0 0 16px rgba(212, 168, 67, 0.3);
+}
+
+.learn-path-node-complete .learn-path-node-circle {
+  border-color: #4caf50;
+  background: rgba(76, 175, 80, 0.1);
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+}
+
+.learn-path-node-current .learn-path-node-circle {
+  border-color: #ffd700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4), 0 0 40px rgba(255, 215, 0, 0.15);
+  animation: pulse-glow-gold 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow-gold {
+  0%, 100% { box-shadow: 0 0 16px rgba(255, 215, 0, 0.3), 0 0 32px rgba(255, 215, 0, 0.1); }
+  50% { box-shadow: 0 0 24px rgba(255, 215, 0, 0.5), 0 0 48px rgba(255, 215, 0, 0.2); }
+}
+
+.learn-path-node-locked .learn-path-node-circle {
+  opacity: 0.4;
+  filter: grayscale(0.6);
+}
+
+.learn-path-node-locked {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.learn-path-node-check {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4caf50;
+  color: white;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(20, 14, 35, 0.9);
+}
+
+.learn-path-node-lock {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  font-size: 14px;
+  filter: grayscale(0.5);
+}
+
+.learn-path-node-star {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  font-size: 18px;
+  animation: float 2s ease-in-out infinite;
+}
+
+.learn-path-node-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.learn-path-node-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fef9e7;
+  line-height: 1.3;
+}
+
+.learn-path-node-complete .learn-path-node-label {
+  color: #a5d6a7;
+}
+
+.learn-path-node-current .learn-path-node-label {
+  color: #ffd700;
+}
+
+.learn-path-node-desc {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.learn-path-node-number {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+.learn-path-node-complete .learn-path-node-number {
+  background: rgba(76, 175, 80, 0.15);
+  border-color: rgba(76, 175, 80, 0.3);
+  color: #4caf50;
+}
+
+.learn-path-node-current .learn-path-node-number {
+  background: rgba(255, 215, 0, 0.15);
+  border-color: rgba(255, 215, 0, 0.4);
+  color: #ffd700;
+}
+
+/* Puzzles Panel */
+.learn-puzzles-inner {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.learn-puzzle-featured {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(139, 105, 20, 0.2), rgba(180, 130, 20, 0.1));
+  border: 2px solid rgba(212, 168, 67, 0.4);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.learn-puzzle-featured:hover {
+  transform: translateY(-2px);
+  border-color: #d4a843;
+  box-shadow: 0 6px 20px rgba(212, 168, 67, 0.25);
+}
+
+.learn-puzzle-featured:active {
+  transform: scale(0.97);
+}
+
+.learn-puzzle-featured-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.learn-puzzle-featured-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.learn-puzzle-featured-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ffd700;
+}
+
+.learn-puzzle-featured-desc {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.learn-puzzle-featured-arrow {
+  color: #d4a843;
+  font-size: 1.2rem;
+}
+
+.learn-puzzle-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.learn-puzzle-group-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 4px;
+}
+
+.learn-puzzle-star {
+  font-size: 0.9rem;
+}
+
+.learn-puzzle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.learn-puzzle-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.learn-puzzle-card:hover {
+  background: rgba(123, 45, 59, 0.15);
+  border-color: rgba(160, 71, 90, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.learn-puzzle-card:active {
+  transform: scale(0.95);
+}
+
+.learn-puzzle-card-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Responsive — Tablet */
+@media (max-width: 1023px) {
+  .learn-hero-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .learn-hero-right {
+    width: 100%;
+  }
+
+  .learn-hero-cta {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Responsive — Mobile */
+@media (max-width: 767px) {
+  .learn-hero-banner {
+    border-radius: 14px;
+  }
+
+  .learn-hero-inner {
+    padding: 18px 16px;
+    gap: 14px;
+  }
+
+  .learn-hero-heading {
+    font-size: 1.3rem;
+  }
+
+  .learn-hero-cta {
+    padding: 14px 24px;
+    font-size: 1rem;
+  }
+
+  .learn-path-container {
+    padding: 12px 10px;
+  }
+
+  .learn-path-node {
+    padding: 12px 14px;
+    gap: 12px;
+  }
+
+  .learn-path-node-circle {
+    width: 48px;
+    height: 48px;
+  }
+
+  .learn-path-node-label {
+    font-size: 0.92rem;
+  }
+
+  .learn-puzzle-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .learn-section {
+    border-radius: 14px;
+  }
+}
+
+/* Large Desktop — 1920px+ */
+@media (min-width: 1920px) {
+  .learn-hero-heading {
+    font-size: 2rem;
+  }
+
+  .learn-hero-cta {
+    padding: 20px 44px;
+    font-size: 1.3rem;
+  }
+
+  .learn-path-node {
+    padding: 18px 22px;
+    gap: 20px;
+  }
+
+  .learn-path-node-circle {
+    width: 64px;
+    height: 64px;
+  }
+
+  .learn-path-node-label {
+    font-size: 1.15rem;
+  }
+
+  .learn-path-node-desc {
+    font-size: 0.92rem;
+  }
+
+  .learn-section-title {
+    font-size: 1.25rem;
+  }
+
+  .learn-puzzle-card {
+    padding: 18px 14px;
+  }
+}
+
+/* 4K — 2560px+ */
+@media (min-width: 2560px) {
+  .learn-hero-heading {
+    font-size: 2.4rem;
+  }
+
+  .learn-hero-inner {
+    padding: 32px 36px;
+  }
+
+  .learn-path-node {
+    padding: 22px 28px;
+    gap: 24px;
+    border-radius: 18px;
+  }
+
+  .learn-path-node-circle {
+    width: 72px;
+    height: 72px;
+  }
+
+  .learn-path-node-label {
+    font-size: 1.3rem;
+  }
+
+  .learn-path-node-desc {
+    font-size: 1rem;
+  }
+
+  .learn-section-title {
+    font-size: 1.4rem;
+  }
+
+  .learn-puzzle-card {
+    padding: 22px 16px;
+    border-radius: 16px;
+  }
+
+  .learn-puzzle-card-label {
+    font-size: 0.95rem;
+  }
+
+  .learn-puzzle-featured {
+    padding: 20px 24px;
+  }
+}
+
+/* Ultra-wide 3000px+ */
+@media (min-width: 3000px) {
+  .learn-hero-banner {
+    border-radius: 1vw;
+  }
+
+  .learn-hero-inner {
+    padding: 1.2vw 1.5vw;
+    border-radius: 0.8vw;
+  }
+
+  .learn-hero-heading {
+    font-size: 1.4vw;
+  }
+
+  .learn-hero-subtext {
+    font-size: 0.6vw;
+  }
+
+  .learn-hero-player-title {
+    font-size: 0.5vw;
+  }
+
+  .learn-hero-player-xp {
+    font-size: 0.4vw;
+  }
+
+  .learn-hero-player-icon {
+    width: 2vw;
+    height: 2vw;
+  }
+
+  .learn-hero-progress-bar {
+    height: 0.3vw;
+    max-width: 10vw;
+  }
+
+  .learn-hero-progress-label {
+    font-size: 0.4vw;
+  }
+
+  .learn-hero-cta {
+    padding: 0.7vw 1.8vw;
+    font-size: 0.8vw;
+    border-radius: 0.7vw;
+  }
+
+  .learn-section {
+    border-radius: 0.8vw;
+  }
+
+  .learn-section-header {
+    padding: 0.6vw 1vw;
+  }
+
+  .learn-section-title {
+    font-size: 0.7vw;
+  }
+
+  .learn-section-badge {
+    font-size: 0.45vw;
+    padding: 0.15vw 0.5vw;
+  }
+
+  .learn-path-container {
+    padding: 0.8vw 0.6vw;
+  }
+
+  .learn-path-node {
+    padding: 0.6vw 0.8vw;
+    gap: 0.8vw;
+    border-radius: 0.6vw;
+  }
+
+  .learn-path-node-circle {
+    width: 2.8vw;
+    height: 2.8vw;
+  }
+
+  .learn-path-node-label {
+    font-size: 0.65vw;
+  }
+
+  .learn-path-node-desc {
+    font-size: 0.5vw;
+  }
+
+  .learn-path-node-number {
+    width: 1.2vw;
+    height: 1.2vw;
+    font-size: 0.4vw;
+  }
+
+  .learn-puzzles-inner {
+    padding: 0.7vw;
+    gap: 0.7vw;
+  }
+
+  .learn-puzzle-featured {
+    padding: 0.7vw 0.9vw;
+    border-radius: 0.6vw;
+  }
+
+  .learn-puzzle-featured-title {
+    font-size: 0.6vw;
+  }
+
+  .learn-puzzle-featured-desc {
+    font-size: 0.4vw;
+  }
+
+  .learn-puzzle-group-title {
+    font-size: 0.4vw;
+  }
+
+  .learn-puzzle-card {
+    padding: 0.6vw 0.4vw;
+    border-radius: 0.5vw;
+  }
+
+  .learn-puzzle-card-label {
+    font-size: 0.45vw;
+  }
+}
