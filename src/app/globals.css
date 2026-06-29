@@ -1478,6 +1478,18 @@ body {
   box-shadow: 0 4px 12px rgba(108, 92, 231, 0.15);
 }
 
+.play-action-btn-confirm {
+  background: rgba(220, 38, 38, 0.2) !important;
+  border-color: rgba(220, 38, 38, 0.6) !important;
+  color: #fca5a5 !important;
+  animation: pulse-confirm 1s ease-in-out infinite;
+}
+
+@keyframes pulse-confirm {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
 .play-action-btn-gold {
   display: flex;
   align-items: center;

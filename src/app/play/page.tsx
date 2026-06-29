@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ChessBoard from '@/components/ChessBoard';
@@ -50,6 +50,21 @@ export default function PlayPage() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [rightTab, setRightTab] = useState<RightTab>('moves');
   const [tabletSidebarOpen, setTabletSidebarOpen] = useState(true);
+  const [confirmAction, setConfirmAction] = useState<'resign' | 'draw' | null>(null);
+  const confirmTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const requestConfirm = useCallback((action: 'resign' | 'draw') => {
+    if (confirmAction === action) {
+      if (confirmTimeout.current) clearTimeout(confirmTimeout.current);
+      setConfirmAction(null);
+      setIsPlaying(false);
+      handleGameEnd(action === 'resign' ? 'loss' : 'draw');
+    } else {
+      setConfirmAction(action);
+      if (confirmTimeout.current) clearTimeout(confirmTimeout.current);
+      confirmTimeout.current = setTimeout(() => setConfirmAction(null), 3000);
+    }
+  }, [confirmAction]);
 
   const currentDifficulty = difficultyLevels[currentDifficultyIndex];
   const xp = stats.xp;
@@ -477,11 +492,11 @@ export default function PlayPage() {
           {/* Action Buttons - Desktop XL only (inline below board) */}
           {isPlaying && !gameResult && (
             <div className="hidden xl:flex items-stretch gap-2 mt-2">
-              <button onClick={() => { setIsPlaying(false); handleGameEnd('loss'); }} className="play-action-btn-dark">
-                 Resign
+              <button onClick={() => requestConfirm('resign')} className={`play-action-btn-dark ${confirmAction === 'resign' ? 'play-action-btn-confirm' : ''}`}>
+                {confirmAction === 'resign' ? 'Confirm?' : 'Resign'}
               </button>
-              <button onClick={() => { setIsPlaying(false); handleGameEnd('draw'); }} className="play-action-btn-dark">
-                Draw
+              <button onClick={() => requestConfirm('draw')} className={`play-action-btn-dark ${confirmAction === 'draw' ? 'play-action-btn-confirm' : ''}`}>
+                {confirmAction === 'draw' ? 'Confirm?' : 'Draw'}
               </button>
               <button onClick={startNewGame} className="play-action-btn-gold">
                 New Game
@@ -517,11 +532,11 @@ export default function PlayPage() {
               </div>
             ) : (
               <div className="play-mobile-action-inner">
-                <button onClick={() => { setIsPlaying(false); handleGameEnd('loss'); }} className="play-mobile-action-secondary">
-                  Resign
+                <button onClick={() => requestConfirm('resign')} className={`play-mobile-action-secondary ${confirmAction === 'resign' ? 'play-action-btn-confirm' : ''}`}>
+                  {confirmAction === 'resign' ? 'Confirm?' : 'Resign'}
                 </button>
-                <button onClick={() => { setIsPlaying(false); handleGameEnd('draw'); }} className="play-mobile-action-secondary">
-                   Draw
+                <button onClick={() => requestConfirm('draw')} className={`play-mobile-action-secondary ${confirmAction === 'draw' ? 'play-action-btn-confirm' : ''}`}>
+                  {confirmAction === 'draw' ? 'Confirm?' : 'Draw'}
                 </button>
                 <button onClick={startNewGame} className="play-mobile-action-primary">
                    New Game
