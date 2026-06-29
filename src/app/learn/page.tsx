@@ -384,7 +384,7 @@ function LessonView({ lesson, currentStepIndex, setCurrentStepIndex, onBack, onC
           <span className="text-xs font-bold text-[#f5d77a] shrink-0">{currentStepIndex + 1}/{lesson.steps.length}</span>
         </div>
         <div className="flex-1 flex flex-col lg:flex-row items-center lg:items-stretch justify-center px-4 md:px-8 lg:px-12 py-4 gap-6 lg:gap-10 overflow-y-auto">
-          <div className="w-full max-w-[min(60vh,440px)] lg:max-w-[min(65vh,500px)] aspect-square shrink-0">
+          <div className="w-full max-w-[min(60vh,440px)] lg:max-w-[min(65vh,500px)] shrink-0">
             <LessonBoard key={`${lesson.id}-${currentStepIndex}`} fen={boardFen} highlightSquares={step.highlightSquares} arrows={step.arrows} interactive={isInteractiveStep} challenge={step.challenge} onChallengeComplete={() => { if (!isLastStep) { setTimeout(() => setCurrentStepIndex(currentStepIndex + 1), 800); } }} />
           </div>
           <div className="flex flex-col justify-center items-center lg:items-start gap-4 lg:gap-6 lg:max-w-sm">

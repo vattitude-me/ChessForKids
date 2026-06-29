@@ -926,6 +926,13 @@ body {
   border-color: rgba(155, 127, 212, 0.3);
 }
 
+.play-player-card-inner {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(155, 127, 212, 0.04));
+  border: 1px solid rgba(155, 127, 212, 0.15);
+}
+
 .play-level-badge {
   width: 36px;
   height: 36px;
@@ -1677,11 +1684,22 @@ body {
   border-radius: 12px;
   background: rgba(13, 10, 26, 0.8);
   border: 1.5px solid rgba(155, 127, 212, 0.3);
-  display: flex;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 767px) {
+  .play-mobile-menu-btn {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) {
+  .play-mobile-menu-btn {
+    display: none !important;
+  }
 }
 
 /* Mobile drawer */
@@ -1823,6 +1841,158 @@ body:has(.play-page-container) > main {
   font-size: 1.3rem;
   font-weight: 900;
   white-space: nowrap;
+}
+
+/* ===== TABLET LAYOUT (768px–1024px) — Balanced 2-column, game-first ===== */
+
+/* Tablet sidebar toggle button */
+.play-tablet-sidebar-toggle {
+  position: fixed;
+  top: 5rem;
+  left: 1rem;
+  z-index: 35;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(13, 10, 26, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(155, 127, 212, 0.35);
+  color: #c084fc;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.play-tablet-sidebar-toggle:hover {
+  border-color: rgba(155, 127, 212, 0.6);
+  box-shadow: 0 4px 20px rgba(108, 92, 231, 0.25);
+  transform: scale(1.05);
+}
+
+/* Tablet sidebar collapse/expand animation */
+.play-tablet-sidebar {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.25s ease,
+              width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  .play-tablet-sidebar-hidden {
+    width: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Tablet action bar sizing */
+  .play-mobile-action-bar {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 16px 16px 0 0;
+    padding: 12px 20px;
+  }
+
+  .play-mobile-action-inner {
+    max-width: 100%;
+    gap: 12px;
+  }
+
+  .play-mobile-action-secondary {
+    padding: 14px 16px;
+    font-size: 0.9rem;
+    border-radius: 14px;
+    min-height: 48px;
+  }
+
+  .play-mobile-action-primary {
+    padding: 14px 20px;
+    font-size: 0.95rem;
+    border-radius: 14px;
+    min-height: 48px;
+  }
+
+  /* Tablet board sizing — maximize when sidebar hidden */
+  .play-tablet-sidebar-hidden ~ main .play-board-frame,
+  .play-tablet-sidebar-hidden ~ main .play-arena-empty {
+    max-width: min(90%, calc(100vh - 240px));
+  }
+
+  /* Tablet spacing & touch targets */
+  .play-dark-card {
+    padding: 14px 16px;
+    border-radius: 16px;
+  }
+
+  .play-card-compact {
+    padding: 12px 14px;
+  }
+
+  .play-diff-compact {
+    padding: 12px 14px;
+    gap: 8px;
+    min-height: 48px;
+  }
+
+  .play-seg-btn {
+    padding: 10px 8px;
+    font-size: 0.8rem;
+    min-height: 44px;
+  }
+
+  .play-cta-btn {
+    padding: 14px 24px;
+    font-size: 1rem;
+    min-height: 48px;
+    border-radius: 14px;
+  }
+
+  .play-cta-compact {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+
+  .play-section-label {
+    font-size: 0.7rem;
+    margin-bottom: 8px;
+  }
+
+  .play-color-btn,
+  .play-theme-swatch,
+  .play-piece-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* VS bar tablet sizing */
+  .play-vs-bar {
+    padding: 10px 20px;
+    gap: 14px;
+  }
+
+  .play-vs-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  /* Hide bottom nav during game on tablet */
+  body:has(.play-game-active) .mobile-bottom-nav {
+    transform: translateY(100%);
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  body:has(.play-game-active) > .flex-1 {
+    padding-bottom: 0 !important;
+  }
 }
 
 /* Large screens (1920px+) — gentle scale up */

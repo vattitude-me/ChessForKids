@@ -237,45 +237,47 @@ export default function LessonBoard({
     : [];
 
   return (
-    <div className="lesson-board-wrapper relative w-full aspect-square">
-      <div className="chess-board-container w-full aspect-square rounded-xl overflow-hidden shadow-lg border-3 border-[#8b5e34]">
-        <Chessboard
-          options={{
-            position: displayOnly ? safeFen : game.fen(),
-            onPieceDrop: isInteractive ? handlePieceDrop : undefined,
-            onSquareClick: isInteractive ? handleSquareClick : undefined,
-            onPieceClick: isInteractive ? handlePieceClick : undefined,
-            canDragPiece: isInteractive ? canDragPiece : () => false,
-            boardOrientation: 'white' as const,
-            pieces: customPieces,
-            boardStyle: { borderRadius: '12px' },
-            darkSquareStyle: { backgroundColor: '#b58863' },
-            lightSquareStyle: { backgroundColor: '#f0d9b5' },
-            squareStyles,
-            arrows: boardArrows,
-            animationDurationInMs: 250,
-            showNotation: true,
-          }}
-        />
+    <div className="lesson-board-wrapper w-full">
+      <div className="relative w-full aspect-square">
+        <div className="chess-board-container w-full aspect-square rounded-xl overflow-hidden shadow-lg border-3 border-[#8b5e34]">
+          <Chessboard
+            options={{
+              position: displayOnly ? safeFen : game.fen(),
+              onPieceDrop: isInteractive ? handlePieceDrop : undefined,
+              onSquareClick: isInteractive ? handleSquareClick : undefined,
+              onPieceClick: isInteractive ? handlePieceClick : undefined,
+              canDragPiece: isInteractive ? canDragPiece : () => false,
+              boardOrientation: 'white' as const,
+              pieces: customPieces,
+              boardStyle: { borderRadius: '12px' },
+              darkSquareStyle: { backgroundColor: '#b58863' },
+              lightSquareStyle: { backgroundColor: '#f0d9b5' },
+              squareStyles,
+              arrows: boardArrows,
+              animationDurationInMs: 250,
+              showNotation: true,
+            }}
+          />
+        </div>
+
+        {/* Feedback overlays */}
+        {completed && challenge && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-xl backdrop-blur-sm z-10">
+            <div className="text-center px-4">
+              <span className="text-5xl block mb-3">🎉</span>
+              <p className="text-lg font-bold text-[#4a3b6b]">{challenge.successMessage}</p>
+            </div>
+          </div>
+        )}
+
+        {wrongMove && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+            <div className="bg-red-50 border-2 border-red-200 rounded-xl px-6 py-3 shadow-lg animate-bounce">
+              <p className="text-red-600 font-bold text-sm">Not quite! Try again.</p>
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* Feedback overlays */}
-      {completed && challenge && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-xl backdrop-blur-sm z-10">
-          <div className="text-center px-4">
-            <span className="text-5xl block mb-3">🎉</span>
-            <p className="text-lg font-bold text-[#4a3b6b]">{challenge.successMessage}</p>
-          </div>
-        </div>
-      )}
-
-      {wrongMove && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-          <div className="bg-red-50 border-2 border-red-200 rounded-xl px-6 py-3 shadow-lg animate-bounce">
-            <p className="text-red-600 font-bold text-sm">Not quite! Try again.</p>
-          </div>
-        </div>
-      )}
 
       {/* Hint and Reset buttons for interactive mode */}
       {isInteractive && (

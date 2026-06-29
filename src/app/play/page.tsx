@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import ChessBoard from '@/components/ChessBoard';
 import { useGameStore } from '@/lib/store';
 import { DifficultyLevel } from '@/lib/chess-ai';
@@ -40,7 +41,7 @@ export default function PlayPage() {
   const [playerColor, setPlayerColor] = useState<'white' | 'black'>('white');
   const [boardTheme, setBoardTheme] = useState<BoardTheme>('wood');
   const [pieceStyle, setPieceStyle] = useState<'classic' | 'fantasy'>('classic');
-  const [gameMode, setGameMode] = useState<'computer' | 'friend' | 'online'>('computer');
+  const [gameMode, setGameMode] = useState<'computer' | 'friend'>('computer');
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
   const [capturedPieces, setCapturedPieces] = useState<{ white: string[]; black: string[] }>({ white: [], black: [] });
   const [gameResult, setGameResult] = useState<string | null>(null);
@@ -48,6 +49,7 @@ export default function PlayPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [rightTab, setRightTab] = useState<RightTab>('moves');
+  const [tabletSidebarOpen, setTabletSidebarOpen] = useState(true);
 
   const currentDifficulty = difficultyLevels[currentDifficultyIndex];
   const xp = stats.xp;
@@ -107,6 +109,11 @@ export default function PlayPage() {
 
   const isInGame = isPlaying || !!gameResult;
 
+  function startNewGameAndCollapse() {
+    startNewGame();
+    setTabletSidebarOpen(false);
+  }
+
   return (
     <div className={`play-page play-page-container min-h-screen flex flex-col relative overflow-hidden ${isInGame ? 'play-game-active' : ''}`}>
       {/* Dark fantasy background */}
@@ -121,13 +128,26 @@ export default function PlayPage() {
         <div className="play-page-overlay absolute inset-0" />
       </div>
 
+      {/* Mobile home button — top left on small screens */}
+      {!mobileMenuOpen && (
+        <Link
+          href="/"
+          className="fixed top-4 left-4 z-40 play-mobile-menu-btn md:hidden"
+          aria-label="Go home"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e0e0ec" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l9-9 9 9" /><path d="M9 21V12h6v9" /></svg>
+        </Link>
+      )}
+
       {/* Mobile menu button — only on small screens where sidebar is hidden */}
-      <button
-        className="md:hidden fixed top-4 right-4 z-40 play-mobile-menu-btn"
-        onClick={() => setMobileMenuOpen(true)}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e0e0ec" strokeWidth="2.5" strokeLinecap="round"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
-      </button>
+      {!mobileMenuOpen && (
+        <button
+          className="fixed top-4 right-4 z-40 play-mobile-menu-btn md:hidden"
+          onClick={() => setMobileMenuOpen(true)}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e0e0ec" strokeWidth="2.5" strokeLinecap="round"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+      )}
 
       {/* Mobile drawer — only on small screens */}
       {mobileMenuOpen && (
@@ -169,9 +189,6 @@ export default function PlayPage() {
                   </button>
                   <button className="play-seg-btn play-seg-btn-disabled" disabled>
                     <span>👤</span> Friend
-                  </button>
-                  <button className="play-seg-btn play-seg-btn-disabled" disabled>
-                    <span>🌐</span> Online
                   </button>
                 </div>
               </div>
@@ -246,7 +263,7 @@ export default function PlayPage() {
               )}
 
               {/* Start Game */}
-              <button onClick={() => { startNewGame(); setMobileMenuOpen(false); }} className="play-cta-btn w-full">
+              <button onClick={() => { startNewGameAndCollapse(); setMobileMenuOpen(false); }} className="play-cta-btn w-full">
                 <span>⚔️</span> Begin Battle
               </button>
             </div>
@@ -254,138 +271,149 @@ export default function PlayPage() {
         </div>
       )}
 
+      {/* Tablet sidebar toggle button — visible only on tablet when sidebar is hidden */}
+      {!tabletSidebarOpen && (
+        <button
+          className="play-tablet-sidebar-toggle hidden md:flex xl:hidden"
+          onClick={() => setTabletSidebarOpen(true)}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      )}
+
       {/* Main layout */}
-      <div className={`relative z-10 flex-1 flex flex-col md:flex-row gap-3 xl:gap-4 px-3 xl:px-5 pt-20 pb-3 min-h-0 max-w-[1800px] mx-auto w-full ${isInGame ? 'pb-[70px] md:pb-3' : ''}`}>
+      <div className={`relative z-10 flex-1 flex flex-col md:flex-row md:items-stretch gap-3 xl:gap-4 px-3 xl:px-5 pt-20 pb-3 min-h-0 md:max-h-screen max-w-[1800px] mx-auto w-full ${isInGame ? 'pb-[70px] md:pb-[72px] xl:pb-3' : ''}`}>
 
         {/* Left Panel - Compact Game Setup (visible from tablet+) */}
-        <aside className="hidden md:flex w-56 lg:w-64 xl:w-72 2xl:w-76 shrink-0 flex-col gap-2 overflow-y-auto max-h-[calc(100vh-6rem)] play-sidebar-scroll">
-          {/* Player Strip - Compact */}
-          <div className="play-dark-card play-player-card play-card-compact">
-            <div className="flex items-center gap-2.5">
-              <div className="play-level-badge-sm">{stats.level}</div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-bold text-xs">Lvl {stats.level} Warrior</span>
-                  <div className="play-streak-badge-sm">
-                    <span className="text-[10px]">🔥</span>
-                    <span className="text-[10px] font-bold text-[#ffd700]">{stats.currentStreak}</span>
+        <aside className={`hidden md:flex w-56 lg:w-64 xl:w-72 2xl:w-76 shrink-0 flex-col play-tablet-sidebar ${!tabletSidebarOpen ? 'play-tablet-sidebar-hidden' : ''}`}>
+          <div className="play-dark-card play-card-compact flex-1 flex flex-col gap-3 overflow-y-auto play-sidebar-scroll">
+            {/* Player Strip */}
+            <div className="play-player-card-inner">
+              <div className="flex items-center gap-2.5">
+                <div className="play-level-badge-sm">{stats.level}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white font-bold text-xs">Lvl {stats.level} Warrior</span>
+                    <div className="play-streak-badge-sm">
+                      <span className="text-[10px]">🔥</span>
+                      <span className="text-[10px] font-bold text-[#ffd700]">{stats.currentStreak}</span>
+                    </div>
                   </div>
+                  <span className="text-[#a0a0b8] text-[11px]">{stats.wins}W / {stats.losses}L / {stats.draws}D</span>
                 </div>
-                <span className="text-[#a0a0b8] text-[11px]">{stats.wins}W / {stats.losses}L / {stats.draws}D</span>
+              </div>
+              <div className="play-xp-bar mt-2">
+                <div className="play-xp-fill" style={{ width: `${xpProgress}%` }} />
+              </div>
+              <div className="flex justify-between mt-1">
+                <span className="text-[10px] text-[#a0a0b8]">{xp % 200}/200 XP</span>
+                <span className="text-[10px] text-[#ffd700]">Next: Lvl {stats.level + 1}</span>
               </div>
             </div>
-            <div className="play-xp-bar mt-2">
-              <div className="play-xp-fill" style={{ width: `${xpProgress}%` }} />
-            </div>
-            <div className="flex justify-between mt-1">
-              <span className="text-[10px] text-[#a0a0b8]">{xp % 200}/200 XP</span>
-              <span className="text-[10px] text-[#ffd700]">Next: Lvl {stats.level + 1}</span>
-            </div>
-          </div>
 
-          {/* Game Mode - Segmented Control */}
-          <div className="play-dark-card play-card-compact">
-            <h3 className="play-section-label mb-2">Game Mode</h3>
-            <div className="play-segmented-row">
-              <button className={`play-seg-btn ${gameMode === 'computer' ? 'play-seg-btn-active' : ''}`} onClick={() => setGameMode('computer')}>
-                <span>🖥️</span> Computer
-              </button>
-              <button className="play-seg-btn play-seg-btn-disabled" disabled>
-                <span>👤</span> Friend
-              </button>
-              <button className="play-seg-btn play-seg-btn-disabled" disabled>
-                <span>🌐</span> Online
-              </button>
-            </div>
-          </div>
+            <div className="border-t border-white/5" />
 
-          {/* Difficulty - Compact 2x2 Grid */}
-          <div className="play-dark-card play-card-compact">
-            <h3 className="play-section-label mb-2">Difficulty</h3>
-            <div className="grid grid-cols-2 gap-1.5">
-              {difficultyLevels.slice(0, 4).map((level, index) => {
-                const isUnlocked = index <= stats.highestDifficultyBeaten + 1;
-                const meta = difficultyMeta[level.label] || { icon: '⭐', color: '#6c5ce7' };
-                return (
-                  <button
-                    key={level.name}
-                    onClick={() => { if (isUnlocked) setDifficulty(index); }}
-                    disabled={!isUnlocked}
-                    className={`play-diff-compact ${index === currentDifficultyIndex ? 'play-diff-compact-active' : ''} ${!isUnlocked ? 'play-diff-compact-locked' : ''}`}
-                  >
-                    <span className="play-diff-compact-icon" style={{ background: isUnlocked ? meta.color : undefined }}>
-                      {isUnlocked ? meta.icon : '🔒'}
-                    </span>
-                    <span className="play-diff-compact-label">{level.label}</span>
-                  </button>
-                );
-              })}
+            {/* Game Mode */}
+            <div>
+              <h3 className="play-section-label mb-2">Game Mode</h3>
+              <div className="play-segmented-row">
+                <button className={`play-seg-btn ${gameMode === 'computer' ? 'play-seg-btn-active' : ''}`} onClick={() => setGameMode('computer')}>
+                  <span>🖥️</span> Computer
+                </button>
+                <button className="play-seg-btn play-seg-btn-disabled" disabled>
+                  <span>👤</span> Friend
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Battle Settings - Collapsible */}
-          <div className="play-dark-card play-card-compact">
-            <button
-              className="play-section-label flex items-center justify-between w-full cursor-pointer"
-              onClick={() => setSettingsOpen(!settingsOpen)}
-            >
-              <span>Battle Settings</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2.5" strokeLinecap="round" className={`transition-transform ${settingsOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6" /></svg>
+            {/* Difficulty */}
+            <div>
+              <h3 className="play-section-label mb-2">Difficulty</h3>
+              <div className="grid grid-cols-2 gap-1.5">
+                {difficultyLevels.slice(0, 4).map((level, index) => {
+                  const isUnlocked = index <= stats.highestDifficultyBeaten + 1;
+                  const meta = difficultyMeta[level.label] || { icon: '⭐', color: '#6c5ce7' };
+                  return (
+                    <button
+                      key={level.name}
+                      onClick={() => { if (isUnlocked) setDifficulty(index); }}
+                      disabled={!isUnlocked}
+                      className={`play-diff-compact ${index === currentDifficultyIndex ? 'play-diff-compact-active' : ''} ${!isUnlocked ? 'play-diff-compact-locked' : ''}`}
+                    >
+                      <span className="play-diff-compact-icon" style={{ background: isUnlocked ? meta.color : undefined }}>
+                        {isUnlocked ? meta.icon : '🔒'}
+                      </span>
+                      <span className="play-diff-compact-label">{level.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Battle Settings - Collapsible */}
+            <div>
+              <button
+                className="play-section-label flex items-center justify-between w-full cursor-pointer"
+                onClick={() => setSettingsOpen(!settingsOpen)}
+              >
+                <span>Battle Settings</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2.5" strokeLinecap="round" className={`transition-transform ${settingsOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6" /></svg>
+              </button>
+              {settingsOpen && (
+                <div className="space-y-3 mt-3 pt-3 border-t border-white/5">
+                  <div>
+                    <label className="play-field-label">Play As</label>
+                    <div className="flex gap-2">
+                      <ColorButton color="white" active={playerColor === 'white'} onClick={() => setPlayerColor('white')} />
+                      <ColorButton color="black" active={playerColor === 'black'} onClick={() => setPlayerColor('black')} />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="play-field-label">Board Theme</label>
+                    <div className="flex gap-2">
+                      {(Object.keys(boardThemes) as BoardTheme[]).map((theme) => (
+                        <ThemeSwatch key={theme} theme={theme} active={boardTheme === theme} onClick={() => setBoardTheme(theme)} />
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="play-field-label">Pieces</label>
+                    <div className="flex gap-2">
+                      <PieceButton style="classic" active={pieceStyle === 'classic'} onClick={() => setPieceStyle('classic')} />
+                      <PieceButton style="fantasy" active={pieceStyle === 'fantasy'} onClick={() => setPieceStyle('fantasy')} />
+                    </div>
+                  </div>
+                </div>
+              )}
+              {!settingsOpen && (
+                <div className="flex items-center gap-3 mt-2 text-xs text-[#a0a0b8]">
+                  <span className={`w-3 h-3 rounded-full ${playerColor === 'white' ? 'bg-white border border-white/40' : 'bg-[#2a2a3e] border border-white/20'}`}></span>
+                  <span>{boardThemes[boardTheme].label}</span>
+                  <span>{pieceStyle === 'classic' ? '♞ Classic' : '🏰 Fantasy'}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Dragon Tips (visible when no right panel) */}
+            <div className="xl:hidden mt-auto pt-3 border-t border-white/5">
+              <div className="flex items-start gap-2.5">
+                <span className="text-xl">🐉</span>
+                <div>
+                  <h4 className="text-xs font-bold text-[#ffd700] mb-0.5">Dragon&apos;s Wisdom</h4>
+                  <p className="text-[11px] text-[#a0a0b8] leading-relaxed">
+                    {currentDifficultyIndex === 0 && "Control the center squares! They give your pieces more room to move."}
+                    {currentDifficultyIndex === 1 && "Develop your knights and bishops early. Don't move the same piece twice!"}
+                    {currentDifficultyIndex === 2 && "Look for forks and pins. These tactics win material!"}
+                    {currentDifficultyIndex === 3 && "Think ahead! Consider what your opponent wants to do after your move."}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Begin Battle */}
+            <button onClick={startNewGameAndCollapse} className="play-cta-btn w-full play-cta-compact mt-auto">
+              <span>⚔️</span> Begin Battle
             </button>
-            {settingsOpen && (
-              <div className="space-y-3 mt-3 pt-3 border-t border-white/5">
-                <div>
-                  <label className="play-field-label">Play As</label>
-                  <div className="flex gap-2">
-                    <ColorButton color="white" active={playerColor === 'white'} onClick={() => setPlayerColor('white')} />
-                    <ColorButton color="black" active={playerColor === 'black'} onClick={() => setPlayerColor('black')} />
-                  </div>
-                </div>
-                <div>
-                  <label className="play-field-label">Board Theme</label>
-                  <div className="flex gap-2">
-                    {(Object.keys(boardThemes) as BoardTheme[]).map((theme) => (
-                      <ThemeSwatch key={theme} theme={theme} active={boardTheme === theme} onClick={() => setBoardTheme(theme)} />
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="play-field-label">Pieces</label>
-                  <div className="flex gap-2">
-                    <PieceButton style="classic" active={pieceStyle === 'classic'} onClick={() => setPieceStyle('classic')} />
-                    <PieceButton style="fantasy" active={pieceStyle === 'fantasy'} onClick={() => setPieceStyle('fantasy')} />
-                  </div>
-                </div>
-              </div>
-            )}
-            {!settingsOpen && (
-              <div className="flex items-center gap-3 mt-2 text-xs text-[#a0a0b8]">
-                <span className={`w-3 h-3 rounded-full ${playerColor === 'white' ? 'bg-white border border-white/40' : 'bg-[#2a2a3e] border border-white/20'}`}></span>
-                <span>{boardThemes[boardTheme].label}</span>
-                <span>{pieceStyle === 'classic' ? '♞ Classic' : '🏰 Fantasy'}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Begin Battle - Always Visible */}
-          <button onClick={startNewGame} className="play-cta-btn w-full play-cta-compact">
-            <span>⚔️</span> Begin Battle
-          </button>
-
-          {/* Dragon Tips - Left Panel (visible when no right panel space) */}
-          <div className="play-dark-card play-tips-card play-card-compact xl:hidden">
-            <div className="flex items-start gap-2.5">
-              <span className="text-xl">🐉</span>
-              <div>
-                <h4 className="text-xs font-bold text-[#ffd700] mb-0.5">Dragon&apos;s Wisdom</h4>
-                <p className="text-[11px] text-[#a0a0b8] leading-relaxed">
-                  {currentDifficultyIndex === 0 && "Control the center squares! They give your pieces more room to move."}
-                  {currentDifficultyIndex === 1 && "Develop your knights and bishops early. Don't move the same piece twice!"}
-                  {currentDifficultyIndex === 2 && "Look for forks and pins. These tactics win material!"}
-                  {currentDifficultyIndex === 3 && "Think ahead! Consider what your opponent wants to do after your move."}
-                </p>
-              </div>
-            </div>
           </div>
         </aside>
 
@@ -435,8 +463,8 @@ export default function PlayPage() {
                   <p className="play-arena-desc">
                     Choose your settings and challenge the {currentDifficulty.label}!
                   </p>
-                  <button onClick={startNewGame} className="play-cta-btn play-cta-btn-lg">
-                    <span>⚔️</span> Begin Battle
+                  <button onClick={startNewGameAndCollapse} className="play-cta-btn play-cta-btn-lg">
+                    Begin Battle
                   </button>
                   <div className="play-arena-hint">
                     <span>🐉</span> Tip: Beat {currentDifficulty.label} to unlock the next difficulty!
@@ -446,24 +474,24 @@ export default function PlayPage() {
             )}
           </div>
 
-          {/* Action Buttons - Tablet+ only (inline below board) */}
+          {/* Action Buttons - Desktop XL only (inline below board) */}
           {isPlaying && !gameResult && (
-            <div className="hidden md:flex items-stretch gap-2 mt-2">
+            <div className="hidden xl:flex items-stretch gap-2 mt-2">
               <button onClick={() => { setIsPlaying(false); handleGameEnd('loss'); }} className="play-action-btn-dark">
-                <span>🏳️</span> Resign
+                 Resign
               </button>
               <button onClick={() => { setIsPlaying(false); handleGameEnd('draw'); }} className="play-action-btn-dark">
-                <span>🤝</span> Draw
+                Draw
               </button>
               <button onClick={startNewGame} className="play-action-btn-gold">
-                <span>⚔️</span> New Game
+                New Game
               </button>
             </div>
           )}
 
-          {/* Game Result - Tablet+ only (inline) */}
+          {/* Game Result - Desktop XL only (inline) */}
           {gameResult && (
-            <div className="hidden md:block play-result-display mt-3">
+            <div className="hidden xl:block play-result-display mt-3">
               <p className={`play-result-text celebrate ${gameResult === 'Victory!' ? 'play-result-win' : gameResult === 'Defeated!' ? 'play-result-loss' : 'play-result-draw'}`}>
                 {gameResult === 'Victory!' && '🏆 '}{gameResult}{gameResult === 'Victory!' && ' 🏆'}
                 {gameResult === 'Defeated!' && ' 💀'}
@@ -475,28 +503,28 @@ export default function PlayPage() {
           )}
         </main>
 
-        {/* Mobile Sticky Game Action Bar */}
+        {/* Sticky Game Action Bar — visible on mobile + tablet during gameplay */}
         {isInGame && (
-          <div className="play-mobile-action-bar md:hidden">
+          <div className="play-mobile-action-bar xl:hidden">
             {gameResult ? (
               <div className="play-mobile-action-inner play-mobile-action-result">
                 <p className={`play-mobile-result-text ${gameResult === 'Victory!' ? 'play-result-win' : gameResult === 'Defeated!' ? 'play-result-loss' : 'play-result-draw'}`}>
                   {gameResult === 'Victory!' && '🏆 '}{gameResult}{gameResult === 'Defeated!' && ' 💀'}
                 </p>
                 <button onClick={startNewGame} className="play-mobile-action-primary">
-                  <span>⚔️</span> New Game
+                   New Game
                 </button>
               </div>
             ) : (
               <div className="play-mobile-action-inner">
                 <button onClick={() => { setIsPlaying(false); handleGameEnd('loss'); }} className="play-mobile-action-secondary">
-                  <span>🏳️</span> Resign
+                  Resign
                 </button>
                 <button onClick={() => { setIsPlaying(false); handleGameEnd('draw'); }} className="play-mobile-action-secondary">
-                  <span>🤝</span> Draw
+                   Draw
                 </button>
                 <button onClick={startNewGame} className="play-mobile-action-primary">
-                  <span>⚔️</span> New Game
+                   New Game
                 </button>
               </div>
             )}
@@ -504,7 +532,7 @@ export default function PlayPage() {
         )}
 
         {/* Right Panel - Tabbed Game Info (visible from xl) */}
-        <aside className="hidden xl:flex w-60 2xl:w-68 shrink-0 flex-col gap-2 xl:max-h-[calc(100vh-6rem)]">
+        <aside className="hidden xl:flex w-72 2xl:w-76 shrink-0 flex-col gap-2 overflow-y-auto play-sidebar-scroll">
           {/* Tabbed Header */}
           <div className="play-dark-card play-card-compact flex-1 min-h-0 flex flex-col">
             <div className="play-tab-bar">
