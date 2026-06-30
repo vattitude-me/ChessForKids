@@ -665,7 +665,7 @@ export default function PlayPage() {
         )}
 
         {/* Right Panel - Tabbed Game Info (visible from xl) */}
-        <aside className="hidden xl:flex w-72 2xl:w-76 shrink-0 flex-col gap-2 overflow-y-auto play-sidebar-scroll">
+        <aside className="hidden xl:flex w-72 2xl:w-80 shrink-0 flex-col gap-2 overflow-y-auto play-sidebar-scroll">
           {/* Tabbed Header */}
           <div className="play-dark-card play-card-compact flex-1 min-h-0 flex flex-col">
             <div className="play-tab-bar">
