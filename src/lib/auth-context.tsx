@@ -14,6 +14,7 @@ import {
 import { getFirebaseAuth } from "./firebase";
 import { useGameStore, loadGameForUser, saveGameForUser } from "./store";
 import { useProfileStore, loadProfileForUser, saveProfileForUser } from "./profile-store";
+import { loadFromCloud, debouncedSaveToCloud, flushCloudSave } from "./firestore-sync";
 
 const toEmail = (username: string) => `${username.toLowerCase().trim()}@chessforkids.app`;
 
@@ -39,11 +40,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
       return;
     }
-    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (u) => {
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), async (u) => {
       if (u && u.uid !== currentUid.current) {
         currentUid.current = u.uid;
-        loadGameForUser(u.uid);
-        loadProfileForUser(u.uid);
+        // Try cloud first, fall back to localStorage
+        const loaded = await loadFromCloud(u.uid);
+        if (!loaded) {
+          loadGameForUser(u.uid);
+          loadProfileForUser(u.uid);
+        }
+        // Also save localStorage as a local cache
+        saveGameForUser(u.uid);
+        saveProfileForUser(u.uid);
       } else if (!u && currentUid.current) {
         currentUid.current = null;
         useGameStore.getState().resetStats();
@@ -55,16 +63,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
-  // Auto-save on store changes
+  // Auto-save on store changes (localStorage + cloud)
   useEffect(() => {
     const unsubGame = useGameStore.subscribe(() => {
       if (currentUid.current) {
         saveGameForUser(currentUid.current);
+        debouncedSaveToCloud(currentUid.current);
       }
     });
     const unsubProfile = useProfileStore.subscribe(() => {
       if (currentUid.current) {
         saveProfileForUser(currentUid.current);
+        debouncedSaveToCloud(currentUid.current);
       }
     });
     return () => { unsubGame(); unsubProfile(); };
@@ -86,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (currentUid.current) {
       saveGameForUser(currentUid.current);
       saveProfileForUser(currentUid.current);
+      await flushCloudSave(currentUid.current);
     }
     await firebaseSignOut(getFirebaseAuth());
   }, []);
