@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import ChessBoard from '@/components/ChessBoard';
 import { useGameStore } from '@/lib/store';
 import { DifficultyLevel } from '@/lib/chess-ai';
+import { useAuth } from '@/lib/auth-context';
 
 type BoardTheme = 'purple' | 'wood' | 'dark' | 'painting';
 
@@ -51,7 +53,116 @@ export default function PlayPage() {
   const [rightTab, setRightTab] = useState<RightTab>('moves');
   const [tabletSidebarOpen, setTabletSidebarOpen] = useState(true);
   const [confirmAction, setConfirmAction] = useState<'resign' | 'draw' | null>(null);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+  const [showNewGameConfirm, setShowNewGameConfirm] = useState(false);
+  const [currentFen, setCurrentFen] = useState<string | null>(null);
+  const [resumeData, setResumeData] = useState<{ fen: string; moves: string[]; captured: { white: string[]; black: string[] }; playerColor: 'white' | 'black'; difficulty: number; boardTheme: BoardTheme; pieceStyle: 'classic' | 'fantasy' } | null>(null);
   const confirmTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const router = useRouter();
+  const { user } = useAuth();
+
+  const SAVE_KEY = user ? `chess-kids-inprogress-${user.uid}` : 'chess-kids-inprogress-anon';
+
+  // Load saved in-progress game on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(SAVE_KEY);
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.fen && data.moves) {
+          setResumeData(data);
+        }
+      }
+    } catch { /* ignore corrupt data */ }
+  }, [SAVE_KEY]);
+
+  // Save in-progress game whenever position changes
+  useEffect(() => {
+    if (isPlaying && currentFen && !gameResult) {
+      const data = {
+        fen: currentFen,
+        moves: moveHistory,
+        captured: capturedPieces,
+        playerColor,
+        difficulty: currentDifficultyIndex,
+        boardTheme,
+        pieceStyle,
+      };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    }
+  }, [currentFen, isPlaying, gameResult, moveHistory, capturedPieces, playerColor, currentDifficultyIndex, boardTheme, pieceStyle, SAVE_KEY]);
+
+  // Clear saved game when game ends
+  useEffect(() => {
+    if (gameResult) {
+      localStorage.removeItem(SAVE_KEY);
+    }
+  }, [gameResult, SAVE_KEY]);
+
+  // Browser beforeunload warning during active game
+  useEffect(() => {
+    if (!isPlaying || gameResult) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [isPlaying, gameResult]);
+
+  function handleNavigation(href: string) {
+    if (isPlaying && !gameResult) {
+      setPendingNavigation(href);
+      setShowLeaveConfirm(true);
+    } else {
+      router.push(href);
+    }
+  }
+
+  function confirmLeave() {
+    setShowLeaveConfirm(false);
+    if (pendingNavigation) {
+      router.push(pendingNavigation);
+    }
+  }
+
+  function cancelLeave() {
+    setShowLeaveConfirm(false);
+    setPendingNavigation(null);
+  }
+
+  function handleNewGameRequest() {
+    if (isPlaying && !gameResult && moveHistory.length > 0) {
+      setShowNewGameConfirm(true);
+    } else {
+      startNewGame();
+    }
+  }
+
+  function confirmNewGame() {
+    setShowNewGameConfirm(false);
+    startNewGameAndCollapse();
+  }
+
+  function resumeSavedGame() {
+    if (!resumeData) return;
+    setPlayerColor(resumeData.playerColor);
+    setMoveHistory(resumeData.moves);
+    setCapturedPieces(resumeData.captured);
+    setBoardTheme(resumeData.boardTheme || 'wood');
+    setPieceStyle(resumeData.pieceStyle || 'classic');
+    setDifficulty(resumeData.difficulty);
+    setCurrentFen(resumeData.fen);
+    setIsPlaying(true);
+    setGameResult(null);
+    setGameKey(prev => prev + 1);
+    setResumeData(null);
+  }
+
+  function dismissResume() {
+    setResumeData(null);
+    localStorage.removeItem(SAVE_KEY);
+  }
 
   const requestConfirm = useCallback((action: 'resign' | 'draw') => {
     if (confirmAction === action) {
@@ -103,7 +214,10 @@ export default function PlayPage() {
     setMoveHistory([]);
     setCapturedPieces({ white: [], black: [] });
     setGameResult(null);
+    setCurrentFen(null);
     setGameKey(prev => prev + 1);
+    setResumeData(null);
+    localStorage.removeItem(SAVE_KEY);
   }
 
   const pieceSymbols: Record<string, string> = { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' };
@@ -129,6 +243,14 @@ export default function PlayPage() {
     setTabletSidebarOpen(false);
   }
 
+  function handleNewGameAndCollapse() {
+    if (isPlaying && !gameResult && moveHistory.length > 0) {
+      setShowNewGameConfirm(true);
+    } else {
+      startNewGameAndCollapse();
+    }
+  }
+
   return (
     <div className={`play-page play-page-container min-h-screen flex flex-col relative overflow-hidden ${isInGame ? 'play-game-active' : ''}`}>
       {/* Dark fantasy background */}
@@ -145,13 +267,13 @@ export default function PlayPage() {
 
       {/* Mobile home button — top left on small screens */}
       {!mobileMenuOpen && (
-        <Link
-          href="/"
+        <button
+          onClick={() => handleNavigation('/')}
           className="fixed top-4 left-4 z-40 play-mobile-menu-btn md:hidden"
           aria-label="Go home"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e0e0ec" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l9-9 9 9" /><path d="M9 21V12h6v9" /></svg>
-        </Link>
+        </button>
       )}
 
       {/* Mobile menu button — only on small screens where sidebar is hidden */}
@@ -278,7 +400,7 @@ export default function PlayPage() {
               )}
 
               {/* Start Game */}
-              <button onClick={() => { startNewGameAndCollapse(); setMobileMenuOpen(false); }} className="play-cta-btn w-full">
+              <button onClick={() => { handleNewGameAndCollapse(); setMobileMenuOpen(false); }} className="play-cta-btn w-full">
                 <span>⚔️</span> Begin Battle
               </button>
             </div>
@@ -426,7 +548,7 @@ export default function PlayPage() {
             </div>
 
             {/* Begin Battle */}
-            <button onClick={startNewGameAndCollapse} className="play-cta-btn w-full play-cta-compact mt-auto">
+            <button onClick={handleNewGameAndCollapse} className="play-cta-btn w-full play-cta-compact mt-auto">
               <span>⚔️</span> Begin Battle
             </button>
           </div>
@@ -464,10 +586,12 @@ export default function PlayPage() {
                   difficulty={currentDifficulty}
                   onGameEnd={handleGameEnd}
                   onMove={handleMove}
+                  onPositionChange={setCurrentFen}
                   playerColor={playerColor}
                   boardTheme={boardThemes[boardTheme]}
                   pieceTheme={pieceStyle}
                   minimal
+                  initialFen={currentFen || undefined}
                 />
               </div>
             ) : (
@@ -478,7 +602,7 @@ export default function PlayPage() {
                   <p className="play-arena-desc">
                     Choose your settings and challenge the {currentDifficulty.label}!
                   </p>
-                  <button onClick={startNewGameAndCollapse} className="play-cta-btn play-cta-btn-lg">
+                  <button onClick={handleNewGameAndCollapse} className="play-cta-btn play-cta-btn-lg">
                     Begin Battle
                   </button>
                   <div className="play-arena-hint">
@@ -497,9 +621,6 @@ export default function PlayPage() {
               </button>
               <button onClick={() => requestConfirm('draw')} className={`play-action-btn-dark ${confirmAction === 'draw' ? 'play-action-btn-confirm' : ''}`}>
                 {confirmAction === 'draw' ? 'Confirm?' : 'Draw'}
-              </button>
-              <button onClick={startNewGame} className="play-action-btn-gold">
-                New Game
               </button>
             </div>
           )}
@@ -537,9 +658,6 @@ export default function PlayPage() {
                 </button>
                 <button onClick={() => requestConfirm('draw')} className={`play-mobile-action-secondary ${confirmAction === 'draw' ? 'play-action-btn-confirm' : ''}`}>
                   {confirmAction === 'draw' ? 'Confirm?' : 'Draw'}
-                </button>
-                <button onClick={startNewGame} className="play-mobile-action-primary">
-                   New Game
                 </button>
               </div>
             )}
@@ -634,6 +752,69 @@ export default function PlayPage() {
           )}
         </aside>
       </div>
+
+      {/* Resume Game Banner */}
+      {resumeData && !isPlaying && !gameResult && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="play-dark-card p-6 rounded-2xl max-w-sm mx-4 text-center space-y-4">
+            <div className="text-4xl">♟️</div>
+            <h3 className="text-xl font-bold text-white">Game In Progress</h3>
+            <p className="text-sm text-[#a0a0b8]">
+              You have an unfinished game ({resumeData.moves.length} moves played). Would you like to continue?
+            </p>
+            <div className="flex gap-3">
+              <button onClick={dismissResume} className="flex-1 px-4 py-2.5 rounded-xl bg-white/10 text-white font-bold text-sm hover:bg-white/20 transition">
+                New Game
+              </button>
+              <button onClick={resumeSavedGame} className="flex-1 px-4 py-2.5 rounded-xl bg-[#6c5ce7] text-white font-bold text-sm hover:bg-[#7c6cf7] transition">
+                Resume
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Leave Confirmation Modal */}
+      {showLeaveConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="play-dark-card p-6 rounded-2xl max-w-sm mx-4 text-center space-y-4">
+            <div className="text-4xl">⚠️</div>
+            <h3 className="text-xl font-bold text-white">Leave Game?</h3>
+            <p className="text-sm text-[#a0a0b8]">
+              Your game is automatically saved. You can resume it when you come back.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={cancelLeave} className="flex-1 px-4 py-2.5 rounded-xl bg-white/10 text-white font-bold text-sm hover:bg-white/20 transition">
+                Stay
+              </button>
+              <button onClick={confirmLeave} className="flex-1 px-4 py-2.5 rounded-xl bg-red-500/80 text-white font-bold text-sm hover:bg-red-500 transition">
+                Leave
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* New Game Confirmation Modal */}
+      {showNewGameConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="play-dark-card p-6 rounded-2xl max-w-sm mx-4 text-center space-y-4">
+            <div className="text-4xl">⚔️</div>
+            <h3 className="text-xl font-bold text-white">Abandon Current Game?</h3>
+            <p className="text-sm text-[#a0a0b8]">
+              Starting a new game will end your current battle. This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowNewGameConfirm(false)} className="flex-1 px-4 py-2.5 rounded-xl bg-white/10 text-white font-bold text-sm hover:bg-white/20 transition">
+                Keep Playing
+              </button>
+              <button onClick={confirmNewGame} className="flex-1 px-4 py-2.5 rounded-xl bg-red-500/80 text-white font-bold text-sm hover:bg-red-500 transition">
+                New Game
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

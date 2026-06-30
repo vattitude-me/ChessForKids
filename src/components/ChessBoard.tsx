@@ -12,10 +12,12 @@ interface ChessBoardProps {
   difficulty: DifficultyLevel;
   onGameEnd: (result: 'win' | 'loss' | 'draw') => void;
   onMove?: (move: { san: string; color: 'w' | 'b'; captured?: string }) => void;
+  onPositionChange?: (fen: string) => void;
   playerColor?: 'white' | 'black';
   boardTheme?: { dark: string; light: string; label: string };
   pieceTheme?: 'classic' | 'fantasy';
   minimal?: boolean;
+  initialFen?: string;
 }
 
 const pieceThemes = {
@@ -23,9 +25,9 @@ const pieceThemes = {
   fantasy: fantasyPieces,
 };
 
-export default function ChessBoard({ difficulty, onGameEnd, onMove, playerColor = 'white', boardTheme, pieceTheme = 'classic', minimal = false }: ChessBoardProps) {
+export default function ChessBoard({ difficulty, onGameEnd, onMove, onPositionChange, playerColor = 'white', boardTheme, pieceTheme = 'classic', minimal = false, initialFen }: ChessBoardProps) {
   const activePieces = pieceThemes[pieceTheme];
-  const [game, setGame] = useState(new Chess());
+  const [game, setGame] = useState(() => initialFen ? new Chess(initialFen) : new Chess());
   const [gameOver, setGameOver] = useState(false);
   const [gameResult, setGameResult] = useState<string>('');
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
@@ -42,6 +44,7 @@ export default function ChessBoard({ difficulty, onGameEnd, onMove, playerColor 
   function updateGame(newGame: Chess) {
     gameRef.current = newGame;
     setGame(newGame);
+    onPositionChange?.(newGame.fen());
   }
 
   const isPlayerTurn = useCallback(() => {
@@ -102,10 +105,11 @@ export default function ChessBoard({ difficulty, onGameEnd, onMove, playerColor 
   }, [difficulty, aiColor, checkGameOver, onMove]);
 
   useEffect(() => {
-    if (playerColor === 'black' && game.turn() === 'w' && !gameOver && moveHistory.length === 0) {
+    if (game.turn() === aiColor && !gameOver && !thinking) {
       makeAIMove();
     }
-  }, [playerColor, game, gameOver, moveHistory.length, makeAIMove]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function selectPiece(square: string) {
     const currentGame = gameRef.current;

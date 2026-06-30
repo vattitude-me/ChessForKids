@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/lib/auth-context';
 import { AVATAR_PRESETS, useProfileStore } from '@/lib/profile-store';
 
@@ -130,8 +131,17 @@ export default function AuthScreen() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="text-5xl mb-3">♞</div>
-          <h1 className="text-3xl font-black text-white" style={{ textShadow: '0 2px 12px rgba(108, 92, 231, 0.6)' }}>
+          <div className="relative inline-block mb-3">
+            <div className="absolute inset-0 rounded-2xl bg-[#1a1035]/80 blur-sm scale-110" />
+            <Image
+              src="/logo.png"
+              alt="Chess for Kids"
+              width={72}
+              height={72}
+              className="relative object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
+            />
+          </div>
+          <h1 className="text-3xl font-black text-white tracking-tight" style={{ textShadow: '0 2px 12px rgba(108, 92, 231, 0.6), 0 4px 20px rgba(0,0,0,0.4)' }}>
             Chess for <span className="text-[#ffd700]">Kids</span>
           </h1>
           <p className="text-[#c4b5e0] mt-2 text-sm">
