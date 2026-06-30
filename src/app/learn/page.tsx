@@ -44,7 +44,7 @@ const puzzleChallenges: { id: string; label: string; image: string; piece?: Piec
   { id: 'queen-puzzles', label: 'Queen Puzzles', image: '/pieces/w-queen.png', piece: 'queen', difficulty: 2 },
   { id: 'king-puzzles', label: 'King Puzzles', image: '/pieces/w-king.png', piece: 'king', difficulty: 3 },
   { id: 'daily', label: 'Daily Challenge', image: '/assets/lessons_images/chest.png', mode: 'daily', difficulty: 2 },
-  { id: 'checkmate', label: 'Checkmate in 1', image: '/assets/lessons_images/Crown.png', mode: 'checkmate', difficulty: 3 },
+  { id: 'checkmate', label: 'Checkmate in 2', image: '/assets/lessons_images/Crown.png', mode: 'checkmate', difficulty: 3 },
 ];
 
 function getPlayerTitle(level: number): string {
@@ -418,8 +418,10 @@ function PuzzleView({ puzzles, currentIndex, setCurrentIndex, onBack, recordPuzz
   const [feedback, setFeedback] = useState('');
   const [attempts, setAttempts] = useState(0);
   const [initialTurn, setInitialTurn] = useState<'w' | 'b'>(() => new Chess(puzzles[0].fen).turn());
+  const [moveStep, setMoveStep] = useState(0);
 
   const currentPuzzle = puzzles[currentIndex];
+  const isMateIn2 = currentPuzzle.theme === 'mate_in_2';
   const turn = initialTurn === 'w' ? 'White' : 'Black';
 
   function loadPuzzle(index: number) {
@@ -431,6 +433,7 @@ function PuzzleView({ puzzles, currentIndex, setCurrentIndex, onBack, recordPuzz
     setShowHint(false);
     setFeedback('');
     setAttempts(0);
+    setMoveStep(0);
     setCurrentIndex(index);
   }
 
@@ -440,20 +443,40 @@ function PuzzleView({ puzzles, currentIndex, setCurrentIndex, onBack, recordPuzz
       const newGame = new Chess(game.fen());
       const move = newGame.move({ from: sourceSquare as Square, to: targetSquare as Square, promotion: 'q' });
       if (!move) return false;
-      const expectedMove = currentPuzzle.solution[0].replace(/[+#]/g, '');
-      const actualMove = move.san.replace(/[+#]/g, '');
-      if (actualMove === expectedMove) {
-        setGame(newGame);
-        setSolved(true);
-        setFeedback('Correct!');
-        recordPuzzleSolved();
-        confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 }, colors: ['#8b6914', '#d4a843', '#f5d77a'] });
+      let isCorrect = false;
+      if (isMateIn2 && moveStep === 1) {
+        isCorrect = newGame.isCheckmate();
+      } else {
+        const expectedMove = currentPuzzle.solution[0].replace(/[+#]/g, '');
+        const actualMove = move.san.replace(/[+#]/g, '');
+        isCorrect = actualMove === expectedMove;
+      }
+      if (isCorrect) {
+        if (isMateIn2 && moveStep === 0) {
+          setGame(newGame);
+          setMoveStep(1);
+          setFeedback('Great first move! Now deliver checkmate!');
+          setTimeout(() => {
+            const blackGame = new Chess(newGame.fen());
+            const blackMoves = blackGame.moves({ verbose: true });
+            if (blackMoves.length > 0) {
+              blackGame.move(blackMoves[0]);
+              setGame(blackGame);
+            }
+          }, 600);
+        } else {
+          setGame(newGame);
+          setSolved(true);
+          setFeedback('Correct!');
+          recordPuzzleSolved();
+          confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 }, colors: ['#8b6914', '#d4a843', '#f5d77a'] });
+        }
       } else {
         setAttempts(prev => prev + 1);
         setFeedback(attempts >= 1 ? 'Not quite... try using the hint!' : 'Not quite... try again!');
         newGame.undo();
       }
-      return actualMove === expectedMove;
+      return isCorrect;
     } catch { return false; }
   }
 

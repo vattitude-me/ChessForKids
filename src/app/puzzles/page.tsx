@@ -16,8 +16,10 @@ export default function PuzzlesPage() {
   const [showHint, setShowHint] = useState(false);
   const [feedback, setFeedback] = useState<string>('');
   const [attempts, setAttempts] = useState(0);
+  const [moveStep, setMoveStep] = useState(0);
 
   const currentPuzzle = puzzles[currentPuzzleIndex];
+  const isMateIn2 = currentPuzzle.theme === 'mate_in_2';
 
   const loadPuzzle = useCallback((index: number) => {
     const puzzle = puzzles[index];
@@ -26,6 +28,7 @@ export default function PuzzlesPage() {
     setShowHint(false);
     setFeedback('');
     setAttempts(0);
+    setMoveStep(0);
     setCurrentPuzzleIndex(index);
   }, [puzzles]);
 
@@ -42,25 +45,50 @@ export default function PuzzlesPage() {
 
       if (!move) return false;
 
-      const expectedMove = currentPuzzle.solution[0];
-      if (move.san === expectedMove) {
-        setGame(newGame);
-        setSolved(true);
-        setFeedback('Correct! Well done, young wizard! ✨');
-        recordPuzzleSolved();
-        confetti({
-          particleCount: 50,
-          spread: 60,
-          origin: { y: 0.7 },
-          colors: ['#6c5ce7', '#a29bfe', '#fdcb6e'],
-        });
+      let isCorrect = false;
+      if (isMateIn2 && moveStep === 1) {
+        // Second move of mate-in-2: accept any move that delivers checkmate
+        isCorrect = newGame.isCheckmate();
+      } else {
+        isCorrect = move.san === currentPuzzle.solution[0];
+      }
+
+      if (isCorrect) {
+        if (isMateIn2 && moveStep === 0) {
+          // First move correct — play Black's response then wait for move 2
+          setGame(newGame);
+          setMoveStep(1);
+          setFeedback('Great first move! Now finish the checkmate! ⚡');
+
+          // Auto-play best Black response after short delay
+          setTimeout(() => {
+            const blackGame = new Chess(newGame.fen());
+            const blackMoves = blackGame.moves({ verbose: true });
+            if (blackMoves.length > 0) {
+              blackGame.move(blackMoves[0]);
+              setGame(blackGame);
+            }
+          }, 600);
+        } else {
+          // Final move (or single-move puzzle) — solved!
+          setGame(newGame);
+          setSolved(true);
+          setFeedback('Correct! Well done, young wizard! ✨');
+          recordPuzzleSolved();
+          confetti({
+            particleCount: 50,
+            spread: 60,
+            origin: { y: 0.7 },
+            colors: ['#6c5ce7', '#a29bfe', '#fdcb6e'],
+          });
+        }
       } else {
         setAttempts(prev => prev + 1);
         setFeedback(attempts >= 1 ? 'Not quite... try using the hint! 💡' : 'Not quite... try again! 🤔');
         newGame.undo();
       }
 
-      return move.san === expectedMove;
+      return isCorrect;
     } catch {
       return false;
     }

@@ -1,5 +1,6 @@
 import { Chess, Move } from 'chess.js';
 import { generateDynamicPuzzles, generateDailyPuzzles } from './puzzle-engine';
+import { generateMateIn2Puzzles } from './mate-in-2-engine';
 
 export interface Puzzle {
   id: string;
@@ -93,9 +94,18 @@ function generatePuzzleId(): string {
 }
 
 export function generatePuzzles(difficulty: number, count: number, mode?: 'checkmate' | 'daily'): Puzzle[] {
-  // Use dynamic engine for mate-in-1 and daily puzzles — never repeats
   if (mode === 'daily') {
+    // Daily challenges are now mate-in-2
+    const mateIn2 = generateMateIn2Puzzles(count);
+    if (mateIn2.length > 0) return mateIn2;
+    // Fallback to mate-in-1 if generation fails
     return generateDailyPuzzles(count);
+  }
+
+  if (mode === 'checkmate') {
+    // Checkmate mode is now mate-in-2
+    const mateIn2 = generateMateIn2Puzzles(count);
+    if (mateIn2.length > 0) return mateIn2;
   }
 
   return generateDynamicPuzzles(difficulty, count);
