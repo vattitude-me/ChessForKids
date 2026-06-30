@@ -1928,6 +1928,7 @@ body:has(.play-page-container) > main {
     transform: translateX(-50%);
     border-radius: 16px 16px 0 0;
     padding: 12px 20px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   }
 
   .play-mobile-action-inner {
