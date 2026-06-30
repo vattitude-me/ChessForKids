@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { DifficultyLevel, generateDifficultyLevels, getAdaptiveDifficulty } from './chess-ai';
 
 export interface Badge {
@@ -88,183 +87,220 @@ const defaultStats: PlayerStats = {
   highestDifficultyBeaten: -1,
 };
 
-export const useGameStore = create<GameState>()(
-  persist(
-    (set, get) => ({
-      playerName: '',
-      playerAge: null,
-      currentDifficultyIndex: 0,
-      difficultyLevels: generateDifficultyLevels(),
-      stats: { ...defaultStats },
-      tutorialProgress: [],
-      gameHistory: [],
+export const useGameStore = create<GameState>()((set, get) => ({
+  playerName: '',
+  playerAge: null,
+  currentDifficultyIndex: 0,
+  difficultyLevels: generateDifficultyLevels(),
+  stats: { ...defaultStats },
+  tutorialProgress: [],
+  gameHistory: [],
 
-      setPlayerName: (name: string) => set({ playerName: name }),
-      setPlayerAge: (age: number) => {
-        const levels = get().difficultyLevels;
-        const suggestedIndex = levels.findIndex(l => l.minAge >= age) - 1;
-        set({
-          playerAge: age,
-          currentDifficultyIndex: Math.max(0, suggestedIndex),
-        });
-      },
+  setPlayerName: (name: string) => set({ playerName: name }),
+  setPlayerAge: (age: number) => {
+    const levels = get().difficultyLevels;
+    const suggestedIndex = levels.findIndex(l => l.minAge >= age) - 1;
+    set({
+      playerAge: age,
+      currentDifficultyIndex: Math.max(0, suggestedIndex),
+    });
+  },
 
-      setDifficulty: (index: number) => set({ currentDifficultyIndex: index }),
+  setDifficulty: (index: number) => set({ currentDifficultyIndex: index }),
 
-      recordWin: () => {
-        const state = get();
-        const newStats = {
-          ...state.stats,
-          totalGames: state.stats.totalGames + 1,
-          wins: state.stats.wins + 1,
-          currentStreak: state.stats.currentStreak + 1,
-          bestStreak: Math.max(state.stats.bestStreak, state.stats.currentStreak + 1),
-          lastPlayedDate: new Date().toISOString(),
-          xp: state.stats.xp + 50,
-          highestDifficultyBeaten: Math.max(state.stats.highestDifficultyBeaten, state.currentDifficultyIndex),
-        };
+  recordWin: () => {
+    const state = get();
+    const newStats = {
+      ...state.stats,
+      totalGames: state.stats.totalGames + 1,
+      wins: state.stats.wins + 1,
+      currentStreak: state.stats.currentStreak + 1,
+      bestStreak: Math.max(state.stats.bestStreak, state.stats.currentStreak + 1),
+      lastPlayedDate: new Date().toISOString(),
+      xp: state.stats.xp + 50,
+      highestDifficultyBeaten: Math.max(state.stats.highestDifficultyBeaten, state.currentDifficultyIndex),
+    };
 
-        const newBadges = [...newStats.badges];
-        if (newStats.wins === 1 && !newBadges.find(b => b.id === 'first_win')) {
-          newBadges.push({ ...allBadges[0], earnedAt: new Date().toISOString() });
-        }
-        if (newStats.currentStreak >= 3 && !newBadges.find(b => b.id === 'streak_3')) {
-          newBadges.push({ ...allBadges[1], earnedAt: new Date().toISOString() });
-        }
-        if (newStats.currentStreak >= 5 && !newBadges.find(b => b.id === 'streak_5')) {
-          newBadges.push({ ...allBadges[2], earnedAt: new Date().toISOString() });
-        }
-        if (newStats.totalGames >= 10 && !newBadges.find(b => b.id === 'ten_games')) {
-          newBadges.push({ ...allBadges[6], earnedAt: new Date().toISOString() });
-        }
-        newStats.badges = newBadges;
-
-        const adaptedLevel = getAdaptiveDifficulty(
-          newStats.wins,
-          newStats.losses,
-          state.currentDifficultyIndex,
-          state.difficultyLevels
-        );
-
-        const newLevel = Math.floor(newStats.xp / 200) + 1;
-        newStats.level = newLevel;
-
-        set({
-          stats: newStats,
-          currentDifficultyIndex: adaptedLevel,
-        });
-      },
-
-      recordLoss: () => {
-        const state = get();
-        const newStats = {
-          ...state.stats,
-          totalGames: state.stats.totalGames + 1,
-          losses: state.stats.losses + 1,
-          currentStreak: 0,
-          lastPlayedDate: new Date().toISOString(),
-          xp: state.stats.xp + 10,
-        };
-
-        const adaptedLevel = getAdaptiveDifficulty(
-          newStats.wins,
-          newStats.losses,
-          state.currentDifficultyIndex,
-          state.difficultyLevels
-        );
-
-        set({
-          stats: newStats,
-          currentDifficultyIndex: adaptedLevel,
-        });
-      },
-
-      recordDraw: () => {
-        const state = get();
-        set({
-          stats: {
-            ...state.stats,
-            totalGames: state.stats.totalGames + 1,
-            draws: state.stats.draws + 1,
-            lastPlayedDate: new Date().toISOString(),
-            xp: state.stats.xp + 25,
-          },
-        });
-      },
-
-      recordPuzzleSolved: () => {
-        const state = get();
-        const newStats = {
-          ...state.stats,
-          puzzlesSolved: state.stats.puzzlesSolved + 1,
-          xp: state.stats.xp + 30,
-        };
-
-        if (newStats.puzzlesSolved >= 10 && !newStats.badges.find(b => b.id === 'puzzle_master')) {
-          newStats.badges = [...newStats.badges, { ...allBadges[3], earnedAt: new Date().toISOString() }];
-        }
-
-        set({ stats: newStats });
-      },
-
-      recordLessonCompleted: (lessonId: number) => {
-        const state = get();
-        const newProgress = [...state.tutorialProgress];
-        if (!newProgress.includes(lessonId)) {
-          newProgress.push(lessonId);
-        }
-
-        const newStats = {
-          ...state.stats,
-          lessonsCompleted: newProgress.length,
-          xp: state.stats.xp + 40,
-        };
-
-        if (newProgress.length >= 5 && !newStats.badges.find(b => b.id === 'scholar')) {
-          newStats.badges = [...newStats.badges, { ...allBadges[4], earnedAt: new Date().toISOString() }];
-        }
-
-        set({ stats: newStats, tutorialProgress: newProgress });
-      },
-
-      addBadge: (badge: Badge) => {
-        const state = get();
-        if (!state.stats.badges.find(b => b.id === badge.id)) {
-          set({
-            stats: {
-              ...state.stats,
-              badges: [...state.stats.badges, { ...badge, earnedAt: new Date().toISOString() }],
-            },
-          });
-        }
-      },
-
-      addXp: (amount: number) => {
-        const state = get();
-        const newXp = state.stats.xp + amount;
-        set({
-          stats: {
-            ...state.stats,
-            xp: newXp,
-            level: Math.floor(newXp / 200) + 1,
-          },
-        });
-      },
-
-      saveGameRecord: (record: Omit<GameRecord, 'id' | 'date'>) => {
-        const state = get();
-        const newRecord: GameRecord = {
-          ...record,
-          id: `game-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-          date: new Date().toISOString(),
-        };
-        set({ gameHistory: [...state.gameHistory, newRecord] });
-      },
-
-      resetStats: () => set({ stats: { ...defaultStats }, gameHistory: [] }),
-    }),
-    {
-      name: 'chess-for-kids-storage',
+    const newBadges = [...newStats.badges];
+    if (newStats.wins === 1 && !newBadges.find(b => b.id === 'first_win')) {
+      newBadges.push({ ...allBadges[0], earnedAt: new Date().toISOString() });
     }
-  )
-);
+    if (newStats.currentStreak >= 3 && !newBadges.find(b => b.id === 'streak_3')) {
+      newBadges.push({ ...allBadges[1], earnedAt: new Date().toISOString() });
+    }
+    if (newStats.currentStreak >= 5 && !newBadges.find(b => b.id === 'streak_5')) {
+      newBadges.push({ ...allBadges[2], earnedAt: new Date().toISOString() });
+    }
+    if (newStats.totalGames >= 10 && !newBadges.find(b => b.id === 'ten_games')) {
+      newBadges.push({ ...allBadges[6], earnedAt: new Date().toISOString() });
+    }
+    newStats.badges = newBadges;
+
+    const adaptedLevel = getAdaptiveDifficulty(
+      newStats.wins,
+      newStats.losses,
+      state.currentDifficultyIndex,
+      state.difficultyLevels
+    );
+
+    const newLevel = Math.floor(newStats.xp / 200) + 1;
+    newStats.level = newLevel;
+
+    set({
+      stats: newStats,
+      currentDifficultyIndex: adaptedLevel,
+    });
+  },
+
+  recordLoss: () => {
+    const state = get();
+    const newStats = {
+      ...state.stats,
+      totalGames: state.stats.totalGames + 1,
+      losses: state.stats.losses + 1,
+      currentStreak: 0,
+      lastPlayedDate: new Date().toISOString(),
+      xp: state.stats.xp + 10,
+    };
+
+    const adaptedLevel = getAdaptiveDifficulty(
+      newStats.wins,
+      newStats.losses,
+      state.currentDifficultyIndex,
+      state.difficultyLevels
+    );
+
+    set({
+      stats: newStats,
+      currentDifficultyIndex: adaptedLevel,
+    });
+  },
+
+  recordDraw: () => {
+    const state = get();
+    set({
+      stats: {
+        ...state.stats,
+        totalGames: state.stats.totalGames + 1,
+        draws: state.stats.draws + 1,
+        lastPlayedDate: new Date().toISOString(),
+        xp: state.stats.xp + 25,
+      },
+    });
+  },
+
+  recordPuzzleSolved: () => {
+    const state = get();
+    const newStats = {
+      ...state.stats,
+      puzzlesSolved: state.stats.puzzlesSolved + 1,
+      xp: state.stats.xp + 30,
+    };
+
+    if (newStats.puzzlesSolved >= 10 && !newStats.badges.find(b => b.id === 'puzzle_master')) {
+      newStats.badges = [...newStats.badges, { ...allBadges[3], earnedAt: new Date().toISOString() }];
+    }
+
+    set({ stats: newStats });
+  },
+
+  recordLessonCompleted: (lessonId: number) => {
+    const state = get();
+    const newProgress = [...state.tutorialProgress];
+    if (!newProgress.includes(lessonId)) {
+      newProgress.push(lessonId);
+    }
+
+    const newStats = {
+      ...state.stats,
+      lessonsCompleted: newProgress.length,
+      xp: state.stats.xp + 40,
+    };
+
+    if (newProgress.length >= 5 && !newStats.badges.find(b => b.id === 'scholar')) {
+      newStats.badges = [...newStats.badges, { ...allBadges[4], earnedAt: new Date().toISOString() }];
+    }
+
+    set({ stats: newStats, tutorialProgress: newProgress });
+  },
+
+  addBadge: (badge: Badge) => {
+    const state = get();
+    if (!state.stats.badges.find(b => b.id === badge.id)) {
+      set({
+        stats: {
+          ...state.stats,
+          badges: [...state.stats.badges, { ...badge, earnedAt: new Date().toISOString() }],
+        },
+      });
+    }
+  },
+
+  addXp: (amount: number) => {
+    const state = get();
+    const newXp = state.stats.xp + amount;
+    set({
+      stats: {
+        ...state.stats,
+        xp: newXp,
+        level: Math.floor(newXp / 200) + 1,
+      },
+    });
+  },
+
+  saveGameRecord: (record: Omit<GameRecord, 'id' | 'date'>) => {
+    const state = get();
+    const newRecord: GameRecord = {
+      ...record,
+      id: `game-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      date: new Date().toISOString(),
+    };
+    set({ gameHistory: [...state.gameHistory, newRecord] });
+  },
+
+  resetStats: () => set({
+    playerName: '',
+    playerAge: null,
+    currentDifficultyIndex: 0,
+    stats: { ...defaultStats },
+    tutorialProgress: [],
+    gameHistory: [],
+  }),
+}));
+
+interface GameData {
+  playerName: string;
+  playerAge: number | null;
+  currentDifficultyIndex: number;
+  stats: PlayerStats;
+  tutorialProgress: number[];
+  gameHistory: GameRecord[];
+}
+
+const GAME_KEY_PREFIX = 'chess-kids-game-';
+
+export function loadGameForUser(uid: string) {
+  const raw = localStorage.getItem(`${GAME_KEY_PREFIX}${uid}`);
+  if (raw) {
+    try {
+      const data = JSON.parse(raw) as GameData;
+      useGameStore.setState({
+        playerName: data.playerName || '',
+        playerAge: data.playerAge ?? null,
+        currentDifficultyIndex: data.currentDifficultyIndex || 0,
+        stats: { ...defaultStats, ...data.stats },
+        tutorialProgress: data.tutorialProgress || [],
+        gameHistory: data.gameHistory || [],
+      });
+    } catch {
+      useGameStore.getState().resetStats();
+    }
+  }
+}
+
+export function saveGameForUser(uid: string) {
+  const { playerName, playerAge, currentDifficultyIndex, stats, tutorialProgress, gameHistory } =
+    useGameStore.getState();
+  const data: GameData = { playerName, playerAge, currentDifficultyIndex, stats, tutorialProgress, gameHistory };
+  localStorage.setItem(`${GAME_KEY_PREFIX}${uid}`, JSON.stringify(data));
+}

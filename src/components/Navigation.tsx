@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useProfileStore, AVATAR_PRESETS } from '@/lib/profile-store';
 
 const navItems = [
   { href: '/', label: 'Home', icon: 'home' },
@@ -14,6 +15,7 @@ const mobileNavItems = [
   { href: '/', label: 'Home', image: '/logo.png' },
   { href: '/learn', label: 'Lessons', image: '/assets/learn_icon.png' },
   { href: '/play', label: 'Play', image: '/assets/lessons_images/swords.png' },
+  { href: '/profile', label: 'Profile', image: null },
 ];
 
 function NavIcon({ type, active }: { type: string; active: boolean }) {
@@ -59,6 +61,8 @@ function NavIcon({ type, active }: { type: string; active: boolean }) {
 
 export default function Navigation() {
   const pathname = usePathname();
+  const profile = useProfileStore((s) => s.profile);
+  const avatarEmoji = AVATAR_PRESETS.find((a) => a.id === profile?.avatarId)?.emoji || '♞';
 
   return (
     <>
@@ -111,8 +115,22 @@ export default function Navigation() {
           </div>
         </nav>
 
-        {/* Spacer to balance the logo width */}
-        <div className="w-[160px] shrink-0" />
+        {/* Profile button */}
+        <div className="w-[160px] shrink-0 flex justify-end">
+          <Link
+            href="/profile"
+            className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all ${
+              pathname === '/profile'
+                ? 'bg-purple-600/30 border border-purple-400/50'
+                : 'hover:bg-white/10 border border-transparent'
+            }`}
+          >
+            <span className="text-xl">{avatarEmoji}</span>
+            <span className={`text-sm font-bold hidden lg:inline ${pathname === '/profile' ? 'text-white' : 'text-[#c4b5e0]'}`}>
+              Profile
+            </span>
+          </Link>
+        </div>
       </div>
 
       {/* Mobile bottom nav */}
@@ -127,13 +145,17 @@ export default function Navigation() {
                 className={`mobile-nav-item flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-2xl transition-all duration-200 ${isActive ? 'mobile-nav-item-active' : ''}`}
               >
                 <div className={`mobile-nav-icon ${isActive ? 'mobile-nav-icon-active' : ''}`}>
-                  <Image
-                    src={item.image}
-                    alt={item.label}
-                    width={32}
-                    height={32}
-                    className="object-contain"
-                  />
+                  {item.image ? (
+                    <Image
+                      src={item.image}
+                      alt={item.label}
+                      width={32}
+                      height={32}
+                      className="object-contain"
+                    />
+                  ) : (
+                    <span className="text-2xl leading-none">{avatarEmoji}</span>
+                  )}
                 </div>
                 <span className={`text-[10px] font-bold tracking-wide ${isActive ? 'text-[#ffd700]' : 'text-[#9a95b0]'}`}>
                   {item.label}

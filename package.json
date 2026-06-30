@@ -12,6 +12,7 @@
     "canvas-confetti": "^1.9.4",
     "chess.js": "^1.4.0",
     "confetti-js": "^0.0.18",
+    "firebase": "^12.15.0",
     "framer-motion": "^12.40.0",
     "next": "16.2.9",
     "react": "19.2.4",
