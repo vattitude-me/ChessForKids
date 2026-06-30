@@ -739,6 +739,7 @@ body {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
+    max-width: 340px;
   }
 
   .home-hero-cta-primary,
@@ -815,6 +816,19 @@ body {
 
 /* Responsive — Tablet */
 @media (min-width: 768px) and (max-width: 1023px) {
+  .home-hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 360px;
+    gap: 12px;
+  }
+
+  .home-hero-cta-primary,
+  .home-hero-cta-secondary {
+    justify-content: center;
+    width: 100%;
+  }
+
   .home-paths-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
