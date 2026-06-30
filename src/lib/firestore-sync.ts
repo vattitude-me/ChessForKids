@@ -21,7 +21,7 @@ interface CloudUserData {
 
 export async function loadFromCloud(uid: string): Promise<boolean> {
   try {
-    const ref = doc(getFirebaseDb(), "users", uid);
+    const ref = doc(getFirebaseDb(), "chess4kids-users", uid);
     const snap = await getDoc(ref);
     if (!snap.exists()) return false;
 
@@ -96,7 +96,7 @@ export async function saveToCloud(uid: string): Promise<void> {
       updatedAt: new Date().toISOString(),
     };
 
-    const ref = doc(getFirebaseDb(), "users", uid);
+    const ref = doc(getFirebaseDb(), "chess4kids-users", uid);
     await setDoc(ref, data, { merge: true });
   } catch {
     // Silent fail — localStorage still has the data
