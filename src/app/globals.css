@@ -1682,9 +1682,6 @@ body {
 .play-result-display {
   text-align: center;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .play-result-text {

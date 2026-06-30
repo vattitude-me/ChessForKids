@@ -627,7 +627,7 @@ export default function PlayPage() {
 
           {/* Game Result - Desktop XL only (inline) */}
           {gameResult && (
-            <div className="hidden xl:block play-result-display mt-3">
+            <div className="hidden xl:flex flex-col items-center play-result-display mt-3">
               <p className={`play-result-text celebrate ${gameResult === 'Victory!' ? 'play-result-win' : gameResult === 'Defeated!' ? 'play-result-loss' : 'play-result-draw'}`}>
                 {gameResult === 'Victory!' && '🏆 '}{gameResult}{gameResult === 'Victory!' && ' 🏆'}
                 {gameResult === 'Defeated!' && ' 💀'}
