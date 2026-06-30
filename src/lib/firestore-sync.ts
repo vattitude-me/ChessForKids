@@ -2,10 +2,11 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getFirebaseDb } from "./firebase";
 import { useGameStore, PlayerStats, GameRecord } from "./store";
 import { useProfileStore, UserProfile } from "./profile-store";
+import { encryptPii, decryptPii } from "./crypto";
 
 interface GameData {
   playerName: string;
-  playerAge: number | null;
+  playerAge: string | null;
   currentDifficultyIndex: number;
   stats: PlayerStats;
   tutorialProgress: number[];
@@ -14,7 +15,7 @@ interface GameData {
 
 interface CloudUserData {
   game: GameData;
-  profile: UserProfile | null;
+  profile: { displayName: string; avatarId: string; createdAt: string } | null;
   updatedAt: string;
 }
 
@@ -27,9 +28,17 @@ export async function loadFromCloud(uid: string): Promise<boolean> {
     const data = snap.data() as CloudUserData;
 
     if (data.game) {
+      const playerName = await decryptPii(data.game.playerName || "", uid);
+      let playerAge: number | null = null;
+      if (data.game.playerAge) {
+        const ageStr = await decryptPii(data.game.playerAge, uid);
+        playerAge = ageStr ? parseInt(ageStr, 10) : null;
+        if (isNaN(playerAge as number)) playerAge = null;
+      }
+
       useGameStore.setState({
-        playerName: data.game.playerName || "",
-        playerAge: data.game.playerAge ?? null,
+        playerName,
+        playerAge,
         currentDifficultyIndex: data.game.currentDifficultyIndex || 0,
         stats: { ...useGameStore.getState().stats, ...data.game.stats },
         tutorialProgress: data.game.tutorialProgress || [],
@@ -38,7 +47,13 @@ export async function loadFromCloud(uid: string): Promise<boolean> {
     }
 
     if (data.profile) {
-      useProfileStore.getState().setProfile(data.profile);
+      const displayName = await decryptPii(data.profile.displayName || "", uid);
+      const profile: UserProfile = {
+        displayName,
+        avatarId: data.profile.avatarId,
+        createdAt: data.profile.createdAt,
+      };
+      useProfileStore.getState().setProfile(profile);
     }
 
     return true;
@@ -53,9 +68,31 @@ export async function saveToCloud(uid: string): Promise<void> {
       useGameStore.getState();
     const { profile } = useProfileStore.getState();
 
+    // Encrypt PII fields only
+    const encPlayerName = await encryptPii(playerName, uid);
+    const encPlayerAge = playerAge != null ? await encryptPii(String(playerAge), uid) : null;
+
+    const gameData: GameData = {
+      playerName: encPlayerName,
+      playerAge: encPlayerAge,
+      currentDifficultyIndex,
+      stats,
+      tutorialProgress,
+      gameHistory,
+    };
+
+    let encProfile: CloudUserData["profile"] = null;
+    if (profile) {
+      encProfile = {
+        displayName: await encryptPii(profile.displayName, uid),
+        avatarId: profile.avatarId,
+        createdAt: profile.createdAt,
+      };
+    }
+
     const data: CloudUserData = {
-      game: { playerName, playerAge, currentDifficultyIndex, stats, tutorialProgress, gameHistory },
-      profile,
+      game: gameData,
+      profile: encProfile,
       updatedAt: new Date().toISOString(),
     };
 
