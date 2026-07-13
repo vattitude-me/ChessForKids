@@ -40,27 +40,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
       return;
     }
-    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), async (u) => {
+
+    let resolved = false;
+
+    // Hard timeout: if Firebase Auth hasn't responded in 3s (e.g. network
+    // blocked, token refresh failing), stop showing the splash and fall through
+    // to the login screen.
+    const timeout = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        setLoading(false);
+      }
+    }, 3000);
+
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (u) => {
+      if (resolved && !u) return; // timeout already showed login screen
+      resolved = true;
+      clearTimeout(timeout);
+
       if (u && u.uid !== currentUid.current) {
         currentUid.current = u.uid;
-        // Try cloud first, fall back to localStorage
-        const loaded = await loadFromCloud(u.uid);
-        if (!loaded) {
-          loadGameForUser(u.uid);
-          loadProfileForUser(u.uid);
-        }
-        // Also save localStorage as a local cache
-        saveGameForUser(u.uid);
-        saveProfileForUser(u.uid);
+        // Load localStorage immediately so the UI can render
+        loadGameForUser(u.uid);
+        loadProfileForUser(u.uid);
+        setUser(u);
+        setLoading(false);
+        // Cloud sync in background with a 5s timeout
+        Promise.race([
+          loadFromCloud(u.uid),
+          new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000)),
+        ]).then((loaded) => {
+          if (loaded) {
+            saveGameForUser(u.uid);
+            saveProfileForUser(u.uid);
+          }
+        });
       } else if (!u && currentUid.current) {
         currentUid.current = null;
         useGameStore.getState().resetStats();
         useProfileStore.getState().clearProfile();
+        setUser(u);
+        setLoading(false);
+      } else {
+        setUser(u);
+        setLoading(false);
       }
-      setUser(u);
-      setLoading(false);
     });
-    return unsubscribe;
+
+    return () => {
+      clearTimeout(timeout);
+      unsubscribe();
+    };
   }, []);
 
   // Auto-save on store changes (localStorage + cloud)
