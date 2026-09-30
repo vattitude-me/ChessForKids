@@ -14,10 +14,22 @@ export const viewport: Viewport = {
   themeColor: "#fff8ee",
 };
 
+const description =
+  "Learn chess step by step with Coach Hoot: fun interactive lessons, puzzles that grow with you, and friendly computer opponents powered by Stockfish.";
+
 export const metadata: Metadata = {
-  title: "Little Knights · Chess for Kids",
-  description:
-    "Learn chess step by step with Coach Hoot: fun interactive lessons, puzzles that grow with you, and friendly computer opponents powered by Stockfish.",
+  metadataBase: new URL("https://chess4kids.vattitude.ca"),
+  title: { default: "Chess 4 Kids · Learn chess the fun way", template: "%s" },
+  description,
+  applicationName: "Chess 4 Kids",
+  openGraph: {
+    title: "Chess 4 Kids",
+    description,
+    url: "/",
+    siteName: "Chess 4 Kids",
+    images: [{ url: "/brand/logo.png", width: 1684, height: 480, alt: "Chess 4 Kids" }],
+    type: "website",
+  },
 };
 
 export default function RootLayout({

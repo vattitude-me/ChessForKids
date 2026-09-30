@@ -1,12 +1,12 @@
 import LegalPage, { LegalSection } from '@/components/legal/LegalPage';
 
-export const metadata = { title: 'Privacy · Little Knights' };
+export const metadata = { title: 'Privacy · Chess 4 Kids' };
 
 export default function PrivacyPage() {
   return (
     <LegalPage title="Privacy Policy" updated="September 2026">
       <LegalSection title="The short version">
-        <p>Little Knights is built for children. It works without an account, shows no ads, and uses no tracking or analytics.</p>
+        <p>Chess 4 Kids is built for children. It works without an account, shows no ads, and uses no tracking or analytics.</p>
       </LegalSection>
       <LegalSection title="What we store">
         <ul>

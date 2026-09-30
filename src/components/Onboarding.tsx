@@ -47,7 +47,7 @@ export default function Onboarding() {
       {step === 0 && (
         <div className="text-center">
           <Mascot mood="cheer" size={110} className="mx-auto animate-float" />
-          <h2 className="mt-2 font-display text-3xl font-extrabold">Welcome to Little Knights!</h2>
+          <h2 className="mt-2 font-display text-3xl font-extrabold">Welcome to Chess 4 Kids!</h2>
           <p className="mt-2 text-lg font-semibold text-muted">I&apos;m Coach Hoot. I&apos;ll help you become a chess champion! 🏆</p>
           <button className="btn btn-lg mt-6 w-full" onClick={() => setStep(1)}>
             Let&apos;s go!

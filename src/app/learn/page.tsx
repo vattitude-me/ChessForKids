@@ -95,7 +95,7 @@ export default function LearnPage() {
       <div className="card p-5 text-center">
         <p className="text-4xl">🎓</p>
         <p className="mt-2 font-display text-xl font-extrabold">Graduation</p>
-        <p className="font-semibold text-muted">Finish every world to become a Little Knights graduate!</p>
+        <p className="font-semibold text-muted">Finish every world to become a Chess 4 Kids graduate!</p>
       </div>
     </div>
   );

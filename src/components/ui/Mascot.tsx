@@ -1,6 +1,6 @@
 export type MascotMood = 'happy' | 'think' | 'wow' | 'sad' | 'cheer';
 
-/** Coach Hoot, the Little Knights owl. Pure SVG so it scales crisply. */
+/** Coach Hoot, the Chess 4 Kids owl. Pure SVG so it scales crisply. */
 export default function Mascot({ mood = 'happy', size = 96, className = '' }: { mood?: MascotMood; size?: number; className?: string }) {
   const eyeY = 52;
   return (

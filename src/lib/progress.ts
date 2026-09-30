@@ -385,6 +385,7 @@ export const useProgress = create<ProgressState>()(
       };
     },
     {
+      // Storage key kept from the redesign so existing progress isn't lost.
       name: 'little-knights-progress',
       version: 2,
       storage: createJSONStorage(() => localStorage),

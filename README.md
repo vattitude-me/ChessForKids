@@ -1,4 +1,4 @@
-# Little Knights ♞ Chess for Kids
+# Chess 4 Kids ♞
 
 A friendly chess academy for children. **Coach Hoot** the owl teaches chess step by step with interactive lessons. Puzzles adapt to each child's level, and the computer opponents run on real **Stockfish 19** inside the browser.
 

@@ -9,7 +9,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const found = findLesson(id);
-  return { title: found ? `${found.lesson.title} · Little Knights` : 'Lesson · Little Knights' };
+  return { title: found ? `${found.lesson.title} · Chess 4 Kids` : 'Lesson · Chess 4 Kids' };
 }
 
 export default async function LessonPage({ params }: { params: Promise<{ id: string }> }) {
