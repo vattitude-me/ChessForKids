@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     description,
     url: "/",
     siteName: "Chess 4 Kids",
-    images: [{ url: "/brand/logo.png", width: 1684, height: 480, alt: "Chess 4 Kids" }],
+    images: [{ url: "/brand/logo.png", width: 1842, height: 480, alt: "Chess 4 Kids" }],
     type: "website",
   },
 };

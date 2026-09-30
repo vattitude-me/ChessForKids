@@ -1,37 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><title>Chess 4 Kids</title>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#6d5fff"/>
-      <stop offset="1" stop-color="#4a3be0"/>
+    <linearGradient id="sh" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b3a7a"/>
+      <stop offset="1" stop-color="#151c44"/>
+    </linearGradient>
+    <linearGradient id="gd" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd35c"/>
+      <stop offset="1" stop-color="#f0a91c"/>
     </linearGradient>
   </defs>
-  <rect x="16" y="16" width="480" height="480" rx="120" fill="url(#bg)"/>
-  <path d="M16 136 a120 120 0 0 1 120 -120 h240 a120 120 0 0 1 120 120 v40 C 380 120, 150 110, 16 190 z" fill="#fff" opacity="0.08"/>
-  <!-- mane (behind head) -->
-  <g fill="#ffc83d">
-    <circle cx="300" cy="132" r="24"/>
-    <circle cx="332" cy="166" r="26"/>
-    <circle cx="352" cy="208" r="27"/>
-    <circle cx="360" cy="254" r="27"/>
-    <circle cx="356" cy="300" r="26"/>
-    <circle cx="350" cy="340" r="24"/>
+  <!-- shield -->
+  <path d="M256 20 L466 84 V246 C466 372 378 456 256 496 C134 456 46 372 46 246 V84 Z" fill="url(#gd)"/>
+  <path d="M256 44 L444 101 V246 C444 358 366 434 256 471 C146 434 68 358 68 246 V101 Z" fill="url(#sh)"/>
+  <!-- subtle board squares in the shield -->
+  <g fill="#ffffff" opacity="0.05">
+    <rect x="96" y="120" width="64" height="64"/><rect x="224" y="120" width="64" height="64"/><rect x="352" y="120" width="64" height="64"/>
+    <rect x="160" y="184" width="64" height="64"/><rect x="288" y="184" width="64" height="64"/>
+    <rect x="96" y="248" width="64" height="64"/><rect x="352" y="248" width="64" height="64"/>
   </g>
-  <!-- back ear -->
-  <path d="M258 110 L 286 70 C 290 64, 298 66, 298 74 L 296 122 Z" fill="#e6e2ff"/>
-  <!-- head -->
-  <path d="M190 360 C 198 322, 214 302, 236 288 C 204 296, 168 298, 146 286 C 118 272, 110 240, 126 216 C 150 184, 190 150, 222 128 L 238 84 C 242 74, 254 74, 258 84 L 274 118 C 334 128, 362 192, 352 262 C 346 302, 338 334, 336 360 Z" fill="#fff"/>
-  <!-- face -->
-  <ellipse cx="226" cy="192" rx="17" ry="21" fill="#22254a"/>
-  <circle cx="232" cy="184" r="6.5" fill="#fff"/>
-  <circle cx="254" cy="238" r="15" fill="#ff8fb1" opacity="0.7"/>
-  <circle cx="140" cy="240" r="6" fill="#b9b1ff"/>
-  <path d="M300 300 C 318 316, 326 338, 326 360 L 336 360 C 338 334, 344 304, 350 272 C 340 290, 322 298, 300 300 Z" fill="#e6e2ff"/>
-  <path d="M150 268 q 16 12 34 2" stroke="#22254a" stroke-width="7" stroke-linecap="round" fill="none"/>
-  <!-- base -->
-  <rect x="172" y="350" width="184" height="34" rx="17" fill="#fff"/>
-  <rect x="136" y="392" width="256" height="48" rx="24" fill="#fff"/>
-  <rect x="136" y="416" width="256" height="24" rx="12" fill="#e6e2ff"/>
-  <!-- sparkle -->
-  <path d="M130 86 l10 24 l24 10 l-24 10 l-10 24 l-10 -24 l-24 -10 l24 -10 z" fill="#ffc83d"/>
-  <circle cx="400" cy="100" r="9" fill="#ffc83d" opacity="0.9"/>
+  <!-- knight -->
+  <g fill="url(#gd)">
+    <path d="M178 372 C 172 330, 190 300, 212 280 L 158 292 C 136 296, 118 284, 118 264 C 118 248, 128 238, 142 230 L 194 194 C 198 166, 214 140, 238 122 L 240 84 L 266 108 C 324 114, 356 160, 358 220 C 360 276, 336 322, 342 372 Z"/>
+    <rect x="170" y="360" width="180" height="30" rx="8"/>
+    <rect x="150" y="396" width="220" height="36" rx="10"/>
+  </g>
+  <!-- mane cuts + eye + nostril (navy) -->
+  <g fill="#151c44">
+    <path d="M296 124 l26 4 l-20 16 z"/>
+    <path d="M324 150 l26 6 l-22 14 z"/>
+    <path d="M343 181 l22 8 l-22 12 z"/>
+    <path d="M354 214 l18 10 l-20 10 z"/>
+    <path d="M358 249 l14 12 l-18 8 z"/>
+    <path d="M226 180 l30 -10 l-8 18 z"/>
+    <circle cx="140" cy="256" r="6"/>
+  </g>
+  <path d="M132 269 L 160 263" stroke="#151c44" stroke-width="6" stroke-linecap="round"/>
+  <rect x="170" y="382" width="180" height="8" fill="#b97d0f" opacity="0.5"/>
 </svg>
