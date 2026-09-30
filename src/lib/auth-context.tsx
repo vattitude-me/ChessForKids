@@ -12,16 +12,20 @@ import {
   setPersistence,
 } from "firebase/auth";
 import { getFirebaseAuth } from "./firebase";
-import { useGameStore, loadGameForUser, saveGameForUser } from "./store";
-import { useProfileStore, loadProfileForUser, saveProfileForUser } from "./profile-store";
-import { loadFromCloud, debouncedSaveToCloud, flushCloudSave } from "./firestore-sync";
+import { useProgress } from "./progress";
+import { loadFromCloud, debouncedSaveToCloud, flushCloudSave, saveToCloud } from "./firestore-sync";
 
 const toEmail = (username: string) => `${username.toLowerCase().trim()}@chessforkids.app`;
+
+/** Cloud accounts are optional: the app works fully offline as a guest. */
+export const cloudEnabled = !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
 
 interface AuthContextType {
   user: User | null;
   username: string | null;
   loading: boolean;
+  syncing: boolean;
+  cloudEnabled: boolean;
   signIn: (username: string, password: string, rememberMe?: boolean) => Promise<void>;
   signUp: (username: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -31,21 +35,15 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(cloudEnabled);
+  const [syncing, setSyncing] = useState(false);
   const currentUid = useRef<string | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
-      setLoading(false);
-      return;
-    }
+    if (!cloudEnabled) return;
 
     let resolved = false;
-
-    // Hard timeout: if Firebase Auth hasn't responded in 3s (e.g. network
-    // blocked, token refresh failing), stop showing the splash and fall through
-    // to the login screen.
+    // Never block the UI on Firebase: after 3s we carry on as a guest.
     const timeout = setTimeout(() => {
       if (!resolved) {
         resolved = true;
@@ -54,36 +52,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, 3000);
 
     const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (u) => {
-      if (resolved && !u) return; // timeout already showed login screen
       resolved = true;
       clearTimeout(timeout);
+      setUser(u);
+      setLoading(false);
 
       if (u && u.uid !== currentUid.current) {
         currentUid.current = u.uid;
-        // Load localStorage immediately so the UI can render
-        loadGameForUser(u.uid);
-        loadProfileForUser(u.uid);
-        setUser(u);
-        setLoading(false);
-        // Cloud sync in background with a 5s timeout
+        setSyncing(true);
         Promise.race([
           loadFromCloud(u.uid),
-          new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000)),
-        ]).then((loaded) => {
-          if (loaded) {
-            saveGameForUser(u.uid);
-            saveProfileForUser(u.uid);
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 6000)),
+        ]).then((cloud) => {
+          const local = useProgress.getState();
+          const localIsFresh = local.xp === 0 && !local.profile.onboarded;
+          if (cloud && (localIsFresh || cloud.updatedAt > local.updatedAt)) {
+            useProgress.getState().replaceAll(cloud);
+          } else {
+            saveToCloud(u.uid);
           }
+          setSyncing(false);
         });
       } else if (!u && currentUid.current) {
         currentUid.current = null;
-        useGameStore.getState().resetStats();
-        useProfileStore.getState().clearProfile();
-        setUser(u);
-        setLoading(false);
-      } else {
-        setUser(u);
-        setLoading(false);
       }
     });
 
@@ -93,21 +84,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Auto-save on store changes (localStorage + cloud)
+  // Keep the cloud copy fresh while signed in.
   useEffect(() => {
-    const unsubGame = useGameStore.subscribe(() => {
-      if (currentUid.current) {
-        saveGameForUser(currentUid.current);
+    return useProgress.subscribe((state, prev) => {
+      if (currentUid.current && state.updatedAt !== prev.updatedAt) {
         debouncedSaveToCloud(currentUid.current);
       }
     });
-    const unsubProfile = useProfileStore.subscribe(() => {
-      if (currentUid.current) {
-        saveProfileForUser(currentUid.current);
-        debouncedSaveToCloud(currentUid.current);
-      }
-    });
-    return () => { unsubGame(); unsubProfile(); };
   }, []);
 
   const signIn = useCallback(async (username: string, password: string, rememberMe = true) => {
@@ -124,17 +107,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOutUser = useCallback(async () => {
     if (currentUid.current) {
-      saveGameForUser(currentUid.current);
-      saveProfileForUser(currentUid.current);
       await flushCloudSave(currentUid.current);
     }
     await firebaseSignOut(getFirebaseAuth());
+    currentUid.current = null;
+    // Shared family devices: start the next player fresh.
+    useProgress.getState().resetAll();
   }, []);
 
   const username = user?.email?.replace("@chessforkids.app", "") || null;
 
   return (
-    <AuthContext.Provider value={{ user, username, loading, signIn, signUp, signOut: signOutUser }}>
+    <AuthContext.Provider value={{ user, username, loading, syncing, cloudEnabled, signIn, signUp, signOut: signOutUser }}>
       {children}
     </AuthContext.Provider>
   );

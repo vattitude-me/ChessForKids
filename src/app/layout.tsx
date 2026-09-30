@@ -1,21 +1,23 @@
 import type { Metadata, Viewport } from "next";
+import { Baloo_2, Nunito } from "next/font/google";
 import "./globals.css";
-import Navigation from "@/components/Navigation";
+import Navigation, { MainArea } from "@/components/Navigation";
 import AppProviders from "@/components/AppProviders";
-import AuthGate from "@/components/AuthGate";
+
+const baloo = Baloo_2({ subsets: ["latin"], weight: ["600", "700", "800"], variable: "--font-baloo" });
+const nunito = Nunito({ subsets: ["latin"], weight: ["500", "600", "700", "800", "900"], variable: "--font-nunito" });
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  themeColor: "#fff8ee",
 };
 
 export const metadata: Metadata = {
-  title: "Chess for Kids - Learn & Play",
-  description: "Learn and play chess in a magical fantasy world! Perfect for kids and adults alike.",
-  icons: {
-    icon: "/favicon.png",
-  },
+  title: "Little Knights · Chess for Kids",
+  description:
+    "Learn chess step by step with Coach Hoot: fun interactive lessons, puzzles that grow with you, and friendly computer opponents powered by Stockfish.",
 };
 
 export default function RootLayout({
@@ -24,15 +26,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="h-full flex flex-col overflow-hidden">
+    <html lang="en" className={`${baloo.variable} ${nunito.variable} antialiased`}>
+      <body className="min-h-screen">
         <AppProviders>
-          <AuthGate>
-            <div className="flex-1 min-h-0 overflow-y-auto pb-16 md:pb-0">
-              {children}
-            </div>
-            <Navigation />
-          </AuthGate>
+          <Navigation />
+          <MainArea>{children}</MainArea>
         </AppProviders>
       </body>
     </html>

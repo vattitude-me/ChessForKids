@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "puzzles:generate": "node scripts/generate-puzzles.mjs",
+    "puzzles:curate": "node scripts/curate-puzzles.mjs"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",

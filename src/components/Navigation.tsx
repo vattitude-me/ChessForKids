@@ -1,170 +1,119 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useProfileStore, AVATAR_PRESETS } from '@/lib/profile-store';
+import { useProgress, levelFromXp, DAILY_XP_GOAL, todayKey } from '@/lib/progress';
+import { useUi } from '@/lib/ui-store';
+import Logo from './Logo';
+import { Ring } from './ui/Progress';
 
-const navItems = [
-  { href: '/', label: 'Home', icon: 'home' },
-  { href: '/learn', label: 'Lessons', icon: 'book' },
-  { href: '/play', label: 'Play Game', icon: 'battle' },
+const NAV = [
+  { href: '/', label: 'Home', icon: '🏠' },
+  { href: '/learn', label: 'Learn', icon: '📚' },
+  { href: '/puzzles', label: 'Puzzles', icon: '🧩' },
+  { href: '/play', label: 'Play', icon: '♟️' },
+  { href: '/profile', label: 'Me', icon: '😊' },
 ];
 
-const mobileNavItems = [
-  { href: '/', label: 'Home', image: '/logo.png' },
-  { href: '/learn', label: 'Lessons', image: '/assets/learn_icon.png' },
-  { href: '/play', label: 'Play', image: '/assets/lessons_images/swords.png' },
-  { href: '/profile', label: 'Profile', image: null },
-];
+function isActive(pathname: string, href: string) {
+  return href === '/' ? pathname === '/' : pathname.startsWith(href);
+}
 
-function NavIcon({ type, active }: { type: string; active: boolean }) {
-  const color = active ? '#ffffff' : '#d0d0dc';
-  const size = 20;
-
-  switch (type) {
-    case 'home':
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
-          <path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3l9-8z" />
-        </svg>
-      );
-    case 'book':
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
-        </svg>
-      );
-    case 'puzzle':
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
-          <path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5a2.5 2.5 0 00-5 0V5H4c-1.1 0-2 .9-2 2v3.8h1.5a2.5 2.5 0 010 5H2V19c0 1.1.9 2 2 2h3.8v-1.5a2.5 2.5 0 015 0V21H17c1.1 0 2-.9 2-2v-4h1.5a2.5 2.5 0 000-5z" />
-        </svg>
-      );
-    case 'chart':
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
-          <path d="M4 20h4V10H4v10zm6 0h4V4h-4v16zm6 0h4v-8h-4v8z" />
-        </svg>
-      );
-    case 'battle':
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
-          <path d="M8 5v14l11-7z" />
-        </svg>
-      );
-    default:
-      return null;
-  }
+export function StatusChips() {
+  const xp = useProgress((s) => s.xp);
+  const streak = useProgress((s) => s.activity.streak);
+  const days = useProgress((s) => s.activity.days);
+  const xpToday = useProgress((s) => s.activity.xpByDay[todayKey()] ?? 0);
+  const { level } = levelFromXp(xp);
+  const activeToday = days.includes(todayKey());
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="chip" title="Day streak">
+        <span className={activeToday ? '' : 'grayscale opacity-60'}>🔥</span>
+        {streak}
+      </span>
+      <span className="chip" title="Today's goal">
+        <Ring value={xpToday} max={DAILY_XP_GOAL} size={22} stroke={4} color="var(--color-mint)" />
+        <span className="hidden sm:inline">{Math.min(xpToday, DAILY_XP_GOAL)}/{DAILY_XP_GOAL}</span>
+      </span>
+      <span className="chip bg-primary-soft whitespace-nowrap text-primary" title="Level">
+        ⭐ {level}
+      </span>
+    </div>
+  );
 }
 
 export default function Navigation() {
   const pathname = usePathname();
-  const profile = useProfileStore((s) => s.profile);
-  const avatarEmoji = AVATAR_PRESETS.find((a) => a.id === profile?.avatarId)?.emoji || '♞';
+  const focus = useUi((s) => s.focus);
+  const avatar = useProgress((s) => s.profile.avatar);
+  const hidden = focus || /^\/learn\/.+/.test(pathname);
+  if (hidden) return null;
 
   return (
     <>
-      {/* Desktop/Tablet: Logo on left + centered nav pill */}
-      <div className="fixed top-0 left-0 right-0 z-50 hidden md:flex items-center px-5 lg:px-8 py-3">
-        {/* Logo - bold, prominent, with dark backing for contrast */}
-        <Link href="/" className="flex items-center gap-3 shrink-0 group">
-          <div className="relative">
-            <div className="absolute inset-0 rounded-2xl bg-[#1a1035]/80 blur-sm scale-110" />
-            <Image
-              src="/logo.png"
-              alt="Chess for Kids"
-              width={56}
-              height={56}
-              className="relative object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform"
-            />
-          </div>
-          <div className="leading-tight">
-            <span className="font-black text-2xl lg:text-3xl block tracking-tight" style={{ color: '#ffffff', textShadow: '0 2px 12px rgba(108, 92, 231, 0.6), 0 4px 20px rgba(0,0,0,0.4)' }}>
-              Chess for <span style={{ color: '#ffd700' }}>Kids</span>
-            </span>
-            <span className="text-[11px] lg:text-xs font-bold block tracking-widest uppercase" style={{ color: '#c4b5e0', textShadow: '0 1px 6px rgba(0,0,0,0.4)' }}>Learn & Play</span>
-          </div>
+      {/* Desktop sidebar */}
+      <nav className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r-2 border-line bg-paper/85 px-4 py-6 backdrop-blur md:flex">
+        <Link href="/" className="mb-8 px-2">
+          <Logo />
         </Link>
-
-        {/* Centered nav pill */}
-        <nav className="flex-1 flex justify-center">
-          <div className="nav-pill flex items-center px-3 lg:px-4 py-2 lg:py-2.5 rounded-full">
-            <div className="flex items-center gap-1">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`nav-pill-item flex items-center gap-2 rounded-full transition-all duration-300 ${
-                      isActive ? 'nav-pill-item-active' : ''
-                    }`}
-                  >
-                    <NavIcon type={item.icon} active={isActive} />
-                    <span className={`font-bold text-sm lg:text-base whitespace-nowrap ${
-                      isActive ? 'text-white nav-pill-item-label' : 'text-[#d0d0dc]'
-                    }`}>
-                      {item.label}
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </nav>
-
-        {/* Profile button */}
-        <div className="w-[160px] shrink-0 flex justify-end">
-          <Link
-            href="/profile"
-            className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all ${
-              pathname === '/profile'
-                ? 'bg-purple-600/30 border border-purple-400/50'
-                : 'hover:bg-white/10 border border-transparent'
-            }`}
-          >
-            <span className="text-xl">{avatarEmoji}</span>
-            <span className={`text-sm font-bold hidden lg:inline ${pathname === '/profile' ? 'text-white' : 'text-[#c4b5e0]'}`}>
-              Profile
-            </span>
-          </Link>
-        </div>
-      </div>
-
-      {/* Mobile bottom nav */}
-      <nav className="mobile-bottom-nav fixed bottom-0 left-0 right-0 z-50 md:hidden">
-        <div className="flex justify-around items-center px-4 py-1.5">
-          {mobileNavItems.map((item) => {
-            const isActive = pathname === item.href;
+        <ul className="flex flex-1 flex-col gap-1.5">
+          {NAV.map((item) => {
+            const active = isActive(pathname, item.href);
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`mobile-nav-item flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-2xl transition-all duration-200 ${isActive ? 'mobile-nav-item-active' : ''}`}
-              >
-                <div className={`mobile-nav-icon ${isActive ? 'mobile-nav-icon-active' : ''}`}>
-                  {item.image ? (
-                    <Image
-                      src={item.image}
-                      alt={item.label}
-                      width={32}
-                      height={32}
-                      className="object-contain"
-                    />
-                  ) : (
-                    <span className="text-2xl leading-none">{avatarEmoji}</span>
-                  )}
-                </div>
-                <span className={`text-[10px] font-bold tracking-wide ${isActive ? 'text-[#ffd700]' : 'text-[#9a95b0]'}`}>
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={`flex items-center gap-3 rounded-2xl border-2 px-4 py-3 font-display text-lg font-bold transition ${
+                    active ? 'border-primary/30 bg-primary-soft text-primary' : 'border-transparent text-muted hover:bg-cream hover:text-ink'
+                  }`}
+                >
+                  <span className="text-2xl">{item.href === '/profile' ? avatar : item.icon}</span>
                   {item.label}
-                </span>
-              </Link>
+                </Link>
+              </li>
             );
           })}
+        </ul>
+        <div className="px-1">
+          <StatusChips />
         </div>
+      </nav>
+
+      {/* Mobile top bar */}
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b-2 border-line bg-cream/90 px-4 py-2.5 backdrop-blur md:hidden">
+        <Link href="/">
+          <Logo compact />
+        </Link>
+        <StatusChips />
+      </header>
+
+      {/* Mobile tab bar */}
+      <nav className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t-2 border-line bg-paper/95 backdrop-blur md:hidden">
+        <ul className="mx-auto flex max-w-lg items-stretch justify-around px-1 pt-1.5">
+          {NAV.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <li key={item.href} className="flex-1">
+                <Link href={item.href} className="flex flex-col items-center gap-0.5 rounded-xl py-1" aria-current={active ? 'page' : undefined}>
+                  <span className={`flex h-9 w-12 items-center justify-center rounded-xl text-2xl transition ${active ? 'bg-primary-soft scale-110' : ''}`}>
+                    {item.href === '/profile' ? avatar : item.icon}
+                  </span>
+                  <span className={`text-[0.72rem] font-extrabold ${active ? 'text-primary' : 'text-muted'}`}>{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </nav>
     </>
   );
+}
+
+/** Main content area; drops the nav padding in focus mode (lessons, live games). */
+export function MainArea({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const focus = useUi((s) => s.focus);
+  const hidden = focus || /^\/learn\/.+/.test(pathname);
+  return <main className={hidden ? 'min-h-screen' : 'min-h-screen pb-24 md:pb-8 md:pl-60'}>{children}</main>;
 }

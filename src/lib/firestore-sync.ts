@@ -1,105 +1,90 @@
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getFirebaseDb } from "./firebase";
-import { useGameStore, PlayerStats, GameRecord } from "./store";
-import { useProfileStore, UserProfile } from "./profile-store";
 import { encryptPii, decryptPii } from "./crypto";
+import { ProgressData, defaultProgress, getProgressData, AVATARS } from "./progress";
 
-interface GameData {
-  playerName: string;
-  playerAge: string | null;
-  currentDifficultyIndex: number;
-  stats: PlayerStats;
-  tutorialProgress: number[];
-  gameHistory: GameRecord[];
+// Cloud documents live in the same collection as v1. Version 2 progress is
+// stored under the `v2` field; the legacy `game`/`profile` fields are left
+// untouched so an older build of the app can still read them.
+const COLLECTION = "chess4kids-users";
+
+interface LegacyStats {
+  totalGames?: number;
+  wins?: number;
+  losses?: number;
+  draws?: number;
+  puzzlesSolved?: number;
+  xp?: number;
+  bestStreak?: number;
 }
 
-interface CloudUserData {
-  game: GameData;
-  profile: { displayName: string; avatarId: string; createdAt: string } | null;
-  updatedAt: string;
+interface CloudDoc {
+  v2?: ProgressData;
+  game?: { playerName?: string; stats?: LegacyStats };
+  profile?: { displayName?: string; avatarId?: string } | null;
+  updatedAt?: string;
 }
 
-export async function loadFromCloud(uid: string): Promise<boolean> {
+const LEGACY_AVATARS: Record<string, string> = {
+  dragon: "🐲", wizard: "🦉", fairy: "🦄", unicorn: "🦄", phoenix: "🚀", owl: "🦉", cat: "🐯", wolf: "🦊",
+};
+
+/** Reads a user's progress from Firestore. Migrates v1 data when that's all there is. */
+export async function loadFromCloud(uid: string): Promise<ProgressData | null> {
   try {
-    const ref = doc(getFirebaseDb(), "chess4kids-users", uid);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) return false;
+    const snap = await getDoc(doc(getFirebaseDb(), COLLECTION, uid));
+    if (!snap.exists()) return null;
+    const data = snap.data() as CloudDoc;
 
-    const data = snap.data() as CloudUserData;
-
-    if (data.game) {
-      const playerName = await decryptPii(data.game.playerName || "", uid);
-      let playerAge: number | null = null;
-      if (data.game.playerAge) {
-        const ageStr = await decryptPii(data.game.playerAge, uid);
-        playerAge = ageStr ? parseInt(ageStr, 10) : null;
-        if (isNaN(playerAge as number)) playerAge = null;
-      }
-
-      useGameStore.setState({
-        playerName,
-        playerAge,
-        currentDifficultyIndex: data.game.currentDifficultyIndex || 0,
-        stats: { ...useGameStore.getState().stats, ...data.game.stats },
-        tutorialProgress: data.game.tutorialProgress || [],
-        gameHistory: data.game.gameHistory || [],
-      });
+    if (data.v2) {
+      const name = await decryptPii(data.v2.profile?.name || "", uid);
+      const age = getProgressData().profile.age;
+      return { ...data.v2, profile: { ...data.v2.profile, name, age } };
     }
 
-    if (data.profile) {
-      const displayName = await decryptPii(data.profile.displayName || "", uid);
-      const profile: UserProfile = {
-        displayName,
-        avatarId: data.profile.avatarId,
-        createdAt: data.profile.createdAt,
+    if (data.game || data.profile) {
+      // One-time import of the original Chess Quest progress.
+      const base = defaultProgress();
+      const stats = data.game?.stats ?? {};
+      const name = await decryptPii(data.profile?.displayName || data.game?.playerName || "", uid);
+      const avatarId = data.profile?.avatarId ?? "";
+      base.profile = {
+        ...base.profile,
+        name,
+        avatar: LEGACY_AVATARS[avatarId] ?? AVATARS[0],
+        onboarded: !!name,
       };
-      useProfileStore.getState().setProfile(profile);
+      base.xp = stats.xp ?? 0;
+      base.games = {
+        ...base.games,
+        played: stats.totalGames ?? 0,
+        wins: stats.wins ?? 0,
+        losses: stats.losses ?? 0,
+        draws: stats.draws ?? 0,
+      };
+      base.puzzles = { ...base.puzzles, solved: stats.puzzlesSolved ?? 0 };
+      base.updatedAt = new Date(0).toISOString(); // let any newer local data win
+      return base;
     }
-
-    return true;
+    return null;
   } catch {
-    return false;
+    return null;
   }
+}
+
+function stripUndefined<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value));
 }
 
 export async function saveToCloud(uid: string): Promise<void> {
   try {
-    const { playerName, playerAge, currentDifficultyIndex, stats, tutorialProgress, gameHistory } =
-      useGameStore.getState();
-    const { profile } = useProfileStore.getState();
-
-    // Encrypt PII fields only
-    const encPlayerName = await encryptPii(playerName, uid);
-    const encPlayerAge = playerAge != null ? await encryptPii(String(playerAge), uid) : null;
-
-    const gameData: GameData = {
-      playerName: encPlayerName,
-      playerAge: encPlayerAge,
-      currentDifficultyIndex,
-      stats,
-      tutorialProgress,
-      gameHistory,
-    };
-
-    let encProfile: CloudUserData["profile"] = null;
-    if (profile) {
-      encProfile = {
-        displayName: await encryptPii(profile.displayName, uid),
-        avatarId: profile.avatarId,
-        createdAt: profile.createdAt,
-      };
-    }
-
-    const data: CloudUserData = {
-      game: gameData,
-      profile: encProfile,
-      updatedAt: new Date().toISOString(),
-    };
-
-    const ref = doc(getFirebaseDb(), "chess4kids-users", uid);
-    await setDoc(ref, data, { merge: true });
+    const data = getProgressData();
+    const encName = await encryptPii(data.profile.name, uid);
+    // The age range never leaves the device.
+    const v2: ProgressData = stripUndefined({ ...data, profile: { ...data.profile, name: encName, age: null } });
+    await setDoc(doc(getFirebaseDb(), COLLECTION, uid), { v2, updatedAt: new Date().toISOString() }, { merge: true });
   } catch {
-    // Silent fail — localStorage still has the data
+    // Silent fail: localStorage still has the data
   }
 }
 
